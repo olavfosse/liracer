@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/olav35/liracer-rewrite/issues"
   },
-  "homepage": "https://github.com/olav35/liracer-rewrite#readme"
+  "homepage": "https://github.com/olav35/liracer-rewrite#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.4"
+  }
 }
