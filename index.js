@@ -1,6 +1,6 @@
 const express = require('express')
 
-const port = 3101
+const port = process.env.PORT || 3101
 const buildPath = `${__dirname}/front/build`
 const app = express()
 
