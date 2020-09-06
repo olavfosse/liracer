@@ -1,8 +1,9 @@
 import React from 'react'
+import Window from './Window'
 
 const ChatAndButtons = () => {
   return (
-    <div>Chat and buttons</div>
+    <Window>Chat and buttons</Window>
   )
 }
 

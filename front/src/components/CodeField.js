@@ -1,8 +1,9 @@
 import React from 'react'
+import Window from './Window'
 
 const CodeField = () => {
   return (
-    <div>Code field</div>
+    <Window>Code field</Window>
   )
 }
 
