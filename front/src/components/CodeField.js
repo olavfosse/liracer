@@ -1,9 +1,20 @@
 import React from 'react'
 import Window from './Window'
+import styled from 'styled-components'
+
+const contentPadding = '1rem'
+
+const Wrapper = styled.div`
+  padding: ${contentPadding}
+`
 
 const CodeField = () => {
   return (
-    <Window>Code field</Window>
+    <Window>
+      <Wrapper>
+        Code field
+      </Wrapper>
+    </Window>
   )
 }
 

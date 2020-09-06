@@ -3,7 +3,6 @@ import styled from 'styled-components'
 import colors from '../colors'
 
 const titleBarHeight = '30px'
-const contentPadding = '1rem'
 
 const Titlebar = styled.div`
   height: ${titleBarHeight};
@@ -11,8 +10,7 @@ const Titlebar = styled.div`
 `
 
 const Content = styled.div`
-  height: calc(100% - ${titleBarHeight} - ${contentPadding} - ${contentPadding});
-  padding: ${contentPadding};
+  height: calc(100% - ${titleBarHeight});
   background: ${colors.layer1Background};
 `
 
