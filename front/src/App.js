@@ -2,6 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 import ChatAndButtons from './components/ChatAndButtons'
 import CodeField from './components/CodeField'
+import colors from './colors'
 
 const Grid = styled.div`
   // Consume the entire viewport
@@ -17,6 +18,9 @@ const Grid = styled.div`
   grid-template-columns: minmax(300px, 500px) minmax(750px, auto);
   padding: 2rem;
   column-gap: 2rem;
+
+  // Color
+  background: ${colors.layer0Background}
 `
 
 function App() {
