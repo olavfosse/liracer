@@ -14,7 +14,9 @@ const Grid = styled.div`
 
   // Use a grid layout
   display: grid;
-  grid-template-columns: minmax(300px, 500px) min(750px);
+  grid-template-columns: minmax(300px, 500px) minmax(750px, auto);
+  padding: 2rem;
+  column-gap: 2rem;
 `
 
 function App() {
