@@ -29,7 +29,7 @@ const ChatInput = styled.input`
   background: ${colors.layer1Background}
 `
 
-const ChatAndButtons = () => {
+const ChatAndJoinButton = () => {
   return (
     <Window>
       <Messages>
@@ -40,8 +40,9 @@ const ChatAndButtons = () => {
       <ChatForm>
         <ChatInput/>
       </ChatForm>
+    {/* The chat button is going here, hence the name */}
     </Window>
   )
 }
 
-export default ChatAndButtons
+export default ChatAndJoinButton

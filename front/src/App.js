@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import ChatAndButtons from './components/ChatAndButtons'
+import ChatAndJoinButton from './components/ChatAndJoinButton'
 import CodeField from './components/CodeField'
 import colors from './colors'
 import isMobile from 'ismobilejs'
@@ -31,7 +31,7 @@ function App() {
     </div>
   ) : (
     <Grid>
-      <ChatAndButtons />
+      <ChatAndJoinButton />
       <CodeField />
     </Grid>
   ) 
