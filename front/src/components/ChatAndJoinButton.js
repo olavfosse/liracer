@@ -40,7 +40,7 @@ const ChatInput = styled.input`${JoinButtonAndChatInputSharedCSS}`
 const JoinButton = styled.button`
   ${JoinButtonAndChatInputSharedCSS}
   transition-duration: 0.1s;
-  font-size: 17px;
+  font-size: 1em;
   :hover {
     background: ${colors.layer2Background};;
   }
