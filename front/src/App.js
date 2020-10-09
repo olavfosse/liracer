@@ -1,10 +1,11 @@
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import styled from 'styled-components'
+import io from 'socket.io-client'
+import isMobile from 'ismobilejs'
 import ChatAndJoinButton from './components/ChatAndJoinButton'
 import CodeField from './components/CodeField'
 import colors from './colors'
-import isMobile from 'ismobilejs'
 const Grid = styled.div`
 // Consume the entire viewport
 position: fixed;
@@ -52,6 +53,18 @@ function App() {
   const [messages, setMessages] = useState(dummyMessages)
   const [cursorPosition, setCursorPosition] = useState(0)
   const [wrongChars, setWrongChars] = useState(0)
+
+  useEffect(() => {
+    let socket
+    if(process.env.NODE_ENV !== 'production') {
+      socket = io('http://localhost:3101')
+    } else {
+      socket = io()
+    }
+
+    socket.on('connect', () => console.log('hello, world'))
+    socket.on('disconnect', () => console.log('goodbye, world'))
+  },[])
 
   return isMobile(window.navigator).any ? (
     <div>
