@@ -34,8 +34,10 @@ const CodeField = (props) => {
 
     const char = mapKeyToChar(event.key)
     if(char) {
-      if(props.code[props.cursorPosition] === char) {
+      if (props.wrongChars === 0 && props.code[props.cursorPosition] === char){
         props.setCursorPosition(props.cursorPosition + 1)
+      } else {
+        props.setWrongChars(props.wrongChars + 1)
       }
     } else {
       if(event.key === 'Backspace') {
