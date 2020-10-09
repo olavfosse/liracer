@@ -55,18 +55,30 @@ const CodeField = (props) => {
       <Pre onKeyDown={handleKeyDown} tabIndex='0'>
         {
           props.code.split('').map((char, index) => {
+            const isOnCursor = index === props.cursorPosition
+            const isOnLastWrongChar = props.wrongChars > 0 && index === props.cursorPosition + props.wrongChars - 1
+            const isOnWrongChar = index >= props.cursorPosition && index < props.cursorPosition + props.wrongChars
+
             let style = {}
 
             if(props.wrongChars > 0) {
-              if(index >= props.cursorPosition && index < props.cursorPosition + props.wrongChars)
-                style.background = colors.wrongCharColor
-            } else if (index === props.cursorPosition) {
+              if(isOnWrongChar)
+              style.background = colors.wrongCharColor
+            } else if (isOnCursor) {
               style.background = 'rgb(207, 186, 165)'
             }
 
+            // Visualize newlines, by using the ↵ character
+            // Only show ↵ when the cursor, or wrongChars markings is on newline
+            if(char === "\n" && (isOnLastWrongChar || (isOnCursor && !isOnWrongChar))) {
+              char = "↵\n"
+            }
+
             return (
-              <span key={index}
-                style={style}>{char}
+              <span key={index} style={style}>
+                {
+                  char
+                }
               </span>
             )
           })
