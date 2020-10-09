@@ -15,7 +15,24 @@ const CodeField = (props) => {
   return (
     <Window>
       <Pre>
-        { props.code }
+        {
+          props.code.split('').map((char, index) => {
+            let style = {}
+
+            if(props.wrongChars > 0) {
+              if(index >= props.cursorPosition && index < props.cursorPosition + props.wrongChars)
+                style.background = colors.wrongCharColor
+            } else if (index === props.cursorPosition) {
+              style.background = 'rgb(207, 186, 165)'
+            }
+
+            return (
+              <span key={index}
+                style={style}>{char}
+              </span>
+            )
+          })
+        }
       </Pre>
     </Window>
   )
