@@ -4,9 +4,9 @@ import styled from 'styled-components'
 
 const contentPadding = '1rem'
 
-const Wrapper = styled.div`
+const Wrapper = styled.pre`
   padding: ${contentPadding};
-  font-family: monospace;
+  margin: 0;
 `
 
 const CodeField = () => {
