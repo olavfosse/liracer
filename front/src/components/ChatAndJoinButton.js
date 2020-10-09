@@ -33,6 +33,7 @@
 // `
 import React from 'react'
 import Window from './Window'
+import Messages from './Messages'
 import styled from 'styled-components'
 import colors from '../colors'
 
@@ -40,12 +41,6 @@ const FlexBox = styled.div`
   display: flex;
   flex-direction: column;
   height: 100%;
-`
-
-const Messages = styled.div`
-  flex-basis: 100%;
-  padding: 1rem;
-  color: ${colors.layer1Foreground};
 `
 
 const ChatForm = styled.form`
@@ -108,10 +103,7 @@ const ChatAndJoinButton = () => {
   return (
     <Window>
       <FlexBox>
-        <Messages>
-          <b>&lt;liracer&gt;</b> Click the JOIN button or type /join &lt;gameid&gt; to join a game. 
-          <br/>
-        </Messages>
+        <Messages/>
         <ChatForm onSubmit={(event) => event.preventDefault() }>
           <ChatInput />
           <ChatSubmit>SEND</ChatSubmit>
