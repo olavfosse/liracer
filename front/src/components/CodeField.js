@@ -12,7 +12,37 @@ const Pre = styled.pre`
   outline: none;
 `
 
+const mapKeyToChar = (key) => {
+  if(['Shift', 'Meta', 'Alt', 'Control', 'Backspace'].includes(key)){
+    throw new Error('Not mapable to key')
+  } else if (key === "Enter"){
+    return "\n"
+  } else if (key === 'Tab') {
+    return "\t"
+  } else {
+    return key
+  }
+}
+
 const CodeField = (props) => {
+  const handleKeyDown = (event) => {
+    // Include description of why the key needs to be preventDefaulted.
+    const preventDefaultKeys = [
+      'Tab' // Iterates through ui elements on Chrome, Firefox
+    ]
+    preventDefaultKeys.includes(event.key) && event.preventDefault()
+
+    let char
+    try {
+      char = mapKeyToChar(event.key)
+    } catch { // Key has no character equivalent
+      return
+    }
+
+    if(props.code[props.cursorPosition] === char)
+      props.setCursorPosition(props.cursorPosition + 1)
+  }
+
   return (
     <Window>
       <Pre onKeyDown={handleKeyDown} tabIndex='0'>

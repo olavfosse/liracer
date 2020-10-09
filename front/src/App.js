@@ -51,7 +51,7 @@ function App() {
   const [code, setCode] = useState(dummyCode)
   const [messages, setMessages] = useState(dummyMessages)
   const [cursorPosition, setCursorPosition] = useState(0)
-  const [wrongChars, setWrongChars] = useState(10)
+  const [wrongChars, setWrongChars] = useState(0)
 
   return isMobile(window.navigator).any ? (
     <div>
@@ -63,6 +63,7 @@ function App() {
       <ChatAndJoinButton messages={ messages } />
       <CodeField code={ code }
                  cursorPosition={cursorPosition}
+                 setCursorPosition={setCursorPosition}
                  wrongChars={wrongChars} />
     </Grid>
   ) 
