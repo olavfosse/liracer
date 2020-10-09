@@ -15,7 +15,15 @@ app.get('/*', (_request, response) => {
 })
 
 io.on('connection', socket => {
-  socket.emit('hello', 'hello, world')
+  socket.emit('code snippet', {
+    language: 'ruby',
+    code:
+    "def fibonacci(n)\n" +
+	  "\tn <= 1 ? n : fibonacci(n-1) + fibonacci(n-2)\n" +
+    "end\n" +
+    "\n" +
+    "puts fibonacci(gets.to_i)"
+  })
 })
 
 console.log(`listening on ${port}`)

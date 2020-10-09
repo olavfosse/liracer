@@ -25,14 +25,6 @@ column-gap: 2rem;
 background: ${colors.layer0Background}
 `
 
-const dummyCode = `\
-def fibonacci(n)
-	n <= 1 ? n : fibonacci(n-1) + fibonacci(n-2)
-end
-
-puts fibonacci(gets.to_i)
-`
-
 const dummyMessages = [
   {
     sender: 'liracer',
@@ -49,7 +41,7 @@ const dummyMessages = [
 ]
 
 function App() {
-  const [code, setCode] = useState(dummyCode)
+  const [code, setCode] = useState()
   const [messages, setMessages] = useState(dummyMessages)
   const [cursorPosition, setCursorPosition] = useState(0)
   const [wrongChars, setWrongChars] = useState(0)
@@ -62,8 +54,9 @@ function App() {
       socket = io()
     }
 
-    socket.on('connect', () => console.log('hello, world'))
-    socket.on('disconnect', () => console.log('goodbye, world'))
+    socket.on('code snippet', ({ language, code }) => {
+      setCode(code)
+    })
   },[])
 
   return isMobile(window.navigator).any ? (
