@@ -1,4 +1,5 @@
 import React from 'react'
+import { useState } from 'react'
 import styled from 'styled-components'
 import ChatAndJoinButton from './components/ChatAndJoinButton'
 import CodeField from './components/CodeField'
@@ -23,7 +24,17 @@ column-gap: 2rem;
 background: ${colors.layer0Background}
 `
 
+const dummyCode = `\
+def fibonacci(n)
+	n <= 1 ? n : fibonacci(n-1) + fibonacci(n-2)
+end
+
+puts fibonacci(gets.to_i)
+`
+
 function App() {
+  const [code, setCode] = useState(dummyCode)
+
   return isMobile(window.navigator).any ? (
     <div>
       <h3>This game is not playable on mobile devices</h3>
@@ -32,7 +43,7 @@ function App() {
   ) : (
     <Grid>
       <ChatAndJoinButton />
-      <CodeField />
+      <CodeField code={ code }/>
     </Grid>
   ) 
 }

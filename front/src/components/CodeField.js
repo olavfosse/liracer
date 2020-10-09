@@ -5,18 +5,18 @@ import colors from '../colors'
 
 const contentPadding = '1rem'
 
-const Wrapper = styled.pre`
+const Pre = styled.pre`
   padding: ${contentPadding};
   margin: 0;
   color: ${colors.layer1Foreground}
 `
 
-const CodeField = () => {
+const CodeField = (props) => {
   return (
     <Window>
-      <Wrapper>
-        Code field
-      </Wrapper>
+      <Pre>
+        { props.code }
+      </Pre>
     </Window>
   )
 }
