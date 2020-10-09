@@ -64,7 +64,8 @@ function App() {
       <CodeField code={ code }
                  cursorPosition={cursorPosition}
                  setCursorPosition={setCursorPosition}
-                 wrongChars={wrongChars} />
+                 wrongChars={wrongChars}
+                 setWrongChars={setWrongChars} />
     </Grid>
   ) 
 }

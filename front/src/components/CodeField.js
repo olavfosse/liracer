@@ -14,7 +14,7 @@ const Pre = styled.pre`
 
 const mapKeyToChar = (key) => {
   if(['Shift', 'Meta', 'Alt', 'Control', 'Backspace'].includes(key)){
-    throw new Error('Not mapable to key')
+    return null
   } else if (key === "Enter"){
     return "\n"
   } else if (key === 'Tab') {
@@ -32,15 +32,20 @@ const CodeField = (props) => {
     ]
     preventDefaultKeys.includes(event.key) && event.preventDefault()
 
-    let char
-    try {
-      char = mapKeyToChar(event.key)
-    } catch { // Key has no character equivalent
-      return
+    const char = mapKeyToChar(event.key)
+    if(char) {
+      if(props.code[props.cursorPosition] === char) {
+        props.setCursorPosition(props.cursorPosition + 1)
+      }
+    } else {
+      if(event.key === 'Backspace') {
+        if(props.wrongChars > 0) {
+          props.setWrongChars(props.wrongChars - 1)
+        } else if(props.cursorPosition > 0) {
+          props.setCursorPosition(props.cursorPosition - 1)
+        }
+      }
     }
-
-    if(props.code[props.cursorPosition] === char)
-      props.setCursorPosition(props.cursorPosition + 1)
   }
 
   return (
