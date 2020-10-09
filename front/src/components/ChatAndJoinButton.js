@@ -99,11 +99,11 @@ const JoinButton = styled.button`
   width: 100%;
 `
 
-const ChatAndJoinButton = () => {
+const ChatAndJoinButton = (props) => {
   return (
     <Window>
       <FlexBox>
-        <Messages/>
+        <Messages messages={props.messages}/>
         <ChatForm onSubmit={(event) => event.preventDefault() }>
           <ChatInput />
           <ChatSubmit>SEND</ChatSubmit>

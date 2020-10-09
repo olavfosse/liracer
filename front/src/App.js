@@ -32,8 +32,24 @@ end
 puts fibonacci(gets.to_i)
 `
 
+const dummyMessages = [
+  {
+    sender: 'liracer',
+    content: 'Click the JOIN button or type "/join GameID" to join a game.'
+  },
+  {
+    sender: 'liracer',
+    content: 'Click the JOIN button or type "/join GameID" to join a game.'
+  },
+  {
+    sender: 'fossegrim',
+    content: 'Another sample message'
+  }
+]
+
 function App() {
   const [code, setCode] = useState(dummyCode)
+  const [messages, setMessages] = useState(dummyMessages)
 
   return isMobile(window.navigator).any ? (
     <div>
@@ -42,8 +58,8 @@ function App() {
     </div>
   ) : (
     <Grid>
-      <ChatAndJoinButton />
-      <CodeField code={ code }/>
+      <ChatAndJoinButton messages={ messages } />
+      <CodeField code={ code } />
     </Grid>
   ) 
 }

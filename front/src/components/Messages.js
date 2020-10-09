@@ -7,11 +7,11 @@ const MessageDiv = styled.div`
   padding-bottom: 7px;
 `
 
-const Message = ({ sender, content }) => {
+const Message = (props) => {
   return (
     <MessageDiv>
       {/* IMPORTANT SPACE --> */}
-      <b>&lt;{sender}&gt;</b> <span>{content}</span>
+      <b>&lt;{props.message.sender}&gt;</b> <span>{props.message.content}</span>
     </MessageDiv>
   )
 }
@@ -24,12 +24,12 @@ const MessagesDiv = styled.div`
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 `
 
-const Messages = () => {
+const Messages = (props) => {
   return (
     <MessagesDiv>
-      <Message sender="liracer" content='Click the JOIN button or type "/join GameID" to join a game.'/>
-      <Message sender="liracer" content='Click the JOIN button or type "/join GameID" to join a game.'/>
-      <Message sender="fossegrim" content='Another sample message'/>
+      {
+        props.messages.map((message, index) => <Message key={index} message={ message }/>)
+      }
     </MessagesDiv>
   )
 }
