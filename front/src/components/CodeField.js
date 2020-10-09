@@ -8,13 +8,14 @@ const contentPadding = '1rem'
 const Pre = styled.pre`
   padding: ${contentPadding};
   margin: 0;
-  color: ${colors.layer1Foreground}
+  color: ${colors.layer1Foreground};
+  outline: none;
 `
 
 const CodeField = (props) => {
   return (
     <Window>
-      <Pre>
+      <Pre onKeyDown={handleKeyDown} tabIndex='0'>
         {
           props.code.split('').map((char, index) => {
             let style = {}
