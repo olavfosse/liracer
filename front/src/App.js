@@ -45,7 +45,7 @@ function App() {
       return
     }
 
-    socket.on('code snippet', ({ language, code }) => {
+    socket.on('code snippet', (code) => {
       setCode(code)
       setCursorPosition(0)
       setWrongChars(0)

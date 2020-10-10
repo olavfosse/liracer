@@ -16,7 +16,7 @@ app.get('/*', (_request, response) => {
 
 const quotes = [
   {
-    language: 'ruby',
+    name: 'fibonacci.rb',
     code:
     "def fibonacci(n)\n" +
 	  "\tn <= 1 ? n : fibonacci(n-1) + fibonacci(n-2)\n" +
@@ -25,28 +25,35 @@ const quotes = [
     "puts fibonacci(gets.to_i)"
   },
   {
-    language: 'ruby',
+    name: 'hello_world.rb',
     code: "puts 'hello, world'"
   }
 ]
 const randomQuote = () => quotes[Math.floor(quotes.length * Math.random())]
 
 io.on('connection', socket => {
-  let quote = randomQuote()
-
-  socket.emit('code snippet', quote)
+  let quote
+  const newQuote = () => {
+    quote = randomQuote()
+    socket.emit('code snippet', quote.code)
+    socket.emit('chat message', {
+      sender: 'liracer',
+      content: `The current quote is ${quote.name}`
+    })
+  }
 
   socket.emit('chat message', {
     sender: 'liracer',
     content: 'Welcome to liracer! Click "JOIN GAME" and enter a GameID, or type "/join GameID" to join a game. If a game by the given GameID exists you join that, otherwise a new game is created.'
   })
 
+  newQuote()
+
   socket.on('cursor position update', position => {
     console.log(`client on position ${position}`)
 
     if(quote.code.length === position) {
-      quote = randomQuote()
-      socket.emit('code snippet', quote)
+      newQuote()
     }
   })
 })
