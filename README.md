@@ -1,4 +1,14 @@
 # liracer-rewrite
-A work in progress rewrite of liracer.
-
-This code is in a very early state. For the production code see https://github.com/olav35/liracer.
+## Setup
+To setup the backend
+```sh
+# Backend
+npm install &&
+npm run dev
+```
+```sh
+# Frontend
+cd front &&
+npm install &&
+npm start
+```
