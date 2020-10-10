@@ -14,26 +14,12 @@ app.get('/*', (_request, response) => {
   response.sendFile(`${buildPath}/index.html`)
 })
 
-const snippets = [
-  {
-    name: 'fibonacci.rb',
-    code:
-    "def fibonacci(n)\n" +
-	  "\tn <= 1 ? n : fibonacci(n-1) + fibonacci(n-2)\n" +
-    "end\n" +
-    "\n" +
-    "puts fibonacci(gets.to_i)"
-  },
-  {
-    name: 'hello_world.rb',
-    code: "puts 'hello, world'"
-  }
-]
+const snippets = require('./snippets.js')
 const randomSnippet = () => snippets[Math.floor(snippets.length * Math.random())]
 
 io.on('connection', socket => {
   let snippet
-  const newSnippet = () => {
+  const useNewSnippet = () => {
     snippet = randomSnippet()
     socket.emit('code snippet', snippet.code)
     socket.emit('chat message', {
@@ -47,13 +33,13 @@ io.on('connection', socket => {
     content: 'Welcome to liracer! Click "JOIN GAME" and enter a GameID, or type "/join GameID" to join a game. If a game by the given GameID exists you join that, otherwise a new game is created.'
   })
 
-  newSnippet()
+  useNewSnippet()
 
   socket.on('cursor position update', position => {
     console.log(`client on position ${position}`)
 
     if(snippet.code.length === position) {
-      newSnippet()
+      useNewSnippet()
     }
   })
 })
