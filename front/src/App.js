@@ -27,8 +27,8 @@ background: ${colors.layer0Background}
 
 function App() {
   const [code, setCode] = useState()
-  const [cursorPosition, setCursorPosition] = useState(0)
-  const [wrongChars, setWrongChars] = useState(0)
+  const [cursorPosition, setCursorPosition] = useState()
+  const [wrongChars, setWrongChars] = useState()
   const [messages, setMessages] = useState([])
 
   useEffect(() => {
@@ -41,6 +41,8 @@ function App() {
 
     socket.on('code snippet', ({ language, code }) => {
       setCode(code)
+      setCursorPosition(0)
+      setWrongChars(0)
     })
 
     socket.on('chat message', message => {
