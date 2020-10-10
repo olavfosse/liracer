@@ -24,6 +24,11 @@ io.on('connection', socket => {
     "\n" +
     "puts fibonacci(gets.to_i)"
   })
+
+  socket.emit('chat message', {
+    sender: 'liracer',
+    content: 'Welcome to liracer! Click "JOIN GAME" and enter a GameID, or type "/join GameID" to join a game. If a game by the given GameID exists you join that, otherwise a new game is created.'
+  })
 })
 
 console.log(`listening on ${port}`)

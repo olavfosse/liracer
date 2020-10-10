@@ -25,26 +25,11 @@ column-gap: 2rem;
 background: ${colors.layer0Background}
 `
 
-const dummyMessages = [
-  {
-    sender: 'liracer',
-    content: 'Click the JOIN button or type "/join GameID" to join a game.'
-  },
-  {
-    sender: 'liracer',
-    content: 'Click the JOIN button or type "/join GameID" to join a game.'
-  },
-  {
-    sender: 'fossegrim',
-    content: 'Another sample message'
-  }
-]
-
 function App() {
   const [code, setCode] = useState()
-  const [messages, setMessages] = useState(dummyMessages)
   const [cursorPosition, setCursorPosition] = useState(0)
   const [wrongChars, setWrongChars] = useState(0)
+  const [messages, setMessages] = useState([])
 
   useEffect(() => {
     let socket
@@ -56,6 +41,10 @@ function App() {
 
     socket.on('code snippet', ({ language, code }) => {
       setCode(code)
+    })
+
+    socket.on('chat message', message => {
+      setMessages(messages => [...messages, message])
     })
   },[])
 
