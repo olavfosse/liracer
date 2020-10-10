@@ -14,8 +14,8 @@ app.get('/*', (_request, response) => {
   response.sendFile(`${buildPath}/index.html`)
 })
 
-io.on('connection', socket => {
-  socket.emit('code snippet', {
+const quotes = [
+  {
     language: 'ruby',
     code:
     "def fibonacci(n)\n" +
@@ -23,11 +23,31 @@ io.on('connection', socket => {
     "end\n" +
     "\n" +
     "puts fibonacci(gets.to_i)"
-  })
+  },
+  {
+    language: 'ruby',
+    code: "puts 'hello, world'"
+  }
+]
+const randomQuote = () => quotes[Math.floor(quotes.length * Math.random())]
+
+io.on('connection', socket => {
+  let quote = randomQuote()
+
+  socket.emit('code snippet', quote)
 
   socket.emit('chat message', {
     sender: 'liracer',
     content: 'Welcome to liracer! Click "JOIN GAME" and enter a GameID, or type "/join GameID" to join a game. If a game by the given GameID exists you join that, otherwise a new game is created.'
+  })
+
+  socket.on('cursor position update', position => {
+    console.log(`client on position ${position}`)
+
+    if(quote.code.length === position) {
+      quote = randomQuote()
+      socket.emit('code snippet', quote)
+    }
   })
 })
 

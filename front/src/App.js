@@ -30,13 +30,19 @@ function App() {
   const [cursorPosition, setCursorPosition] = useState()
   const [wrongChars, setWrongChars] = useState()
   const [messages, setMessages] = useState([])
+  const [socket, setSocket] = useState()
 
   useEffect(() => {
-    let socket
     if(process.env.NODE_ENV !== 'production') {
-      socket = io('http://localhost:3101')
+      setSocket(io('http://localhost:3101'))
     } else {
-      socket = io()
+      setSocket(io())
+    }
+  }, [])
+
+  useEffect(() => {
+    if(!socket) {
+      return
     }
 
     socket.on('code snippet', ({ language, code }) => {
@@ -48,7 +54,15 @@ function App() {
     socket.on('chat message', message => {
       setMessages(messages => [...messages, message])
     })
-  },[])
+  }, [socket])
+
+  useEffect(() => {
+    if(!socket || cursorPosition === undefined) {
+      return
+    }
+
+    socket.emit('cursor position update', cursorPosition)
+  }, [socket, cursorPosition])
 
   return isMobile(window.navigator).any ? (
     <div>
