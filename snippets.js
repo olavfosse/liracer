@@ -59,7 +59,6 @@ const enforceNoExcessNewline = (snippets) => {
     const index = snippet.code.length - 1
     if(snippet.code[index] === '\n'){
       const path = getProgramPath(snippet.language, snippet.program)
-      // refactor getProgramPath to be getQuotePath
       console.error(`ERROR: Found excess newline at ${path}:${index + 1}`)
       process.exit(1)
     }
