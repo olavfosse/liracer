@@ -32,6 +32,8 @@ function App() {
   const [messages, setMessages] = useState([])
   const [socket, setSocket] = useState()
 
+  const joinGame = gameID => socket.emit('join game', gameID)
+
   useEffect(() => {
     if(process.env.NODE_ENV !== 'production') {
       setSocket(io('http://localhost:3101'))
@@ -71,7 +73,8 @@ function App() {
     </div>
   ) : (
     <Grid>
-      <ChatAndJoinButton messages={ messages } />
+      <ChatAndJoinButton messages={ messages }
+                         joinGame={ joinGame }/>
       <CodeField code={ code }
                  cursorPosition={cursorPosition}
                  setCursorPosition={setCursorPosition}

@@ -104,12 +104,12 @@ const ChatAndJoinButton = (props) => {
     <Window>
       <FlexBox>
         <Messages messages={props.messages}/>
-        <ChatForm onSubmit={(event) => event.preventDefault() }>
+        <ChatForm onSubmit={event => event.preventDefault()}>
           <ChatInput />
           <ChatSubmit>SEND</ChatSubmit>
         </ChatForm>
         <JoinButtonContainer>
-          <JoinButton onClick={() => prompt('GameID')}>
+          <JoinButton onClick={() => props.joinGame(prompt('GameID'))}>
             JOIN GAME
           </JoinButton>
         </JoinButtonContainer>

@@ -17,29 +17,59 @@ app.get('/*', (_request, response) => {
 const snippets = require('./snippets.js')
 const randomSnippet = () => snippets[Math.floor(snippets.length * Math.random())]
 
+const games = {}
+
 io.on('connection', socket => {
-  let snippet
-  const useNewSnippet = () => {
-    snippet = randomSnippet()
-    socket.emit('code snippet', snippet.code)
-    socket.emit('chat message', {
+  let gameID
+
+  const sendLeaveMessage = id => {
+    io.to(id).emit('chat message', {
       sender: 'liracer',
-      content: `The current snippet is ${snippet.name}`
+      content: 'Player left'
     })
   }
 
-  socket.emit('chat message', {
-    sender: 'liracer',
-    content: 'Welcome to liracer! Click "JOIN GAME" and enter a GameID, or type "/join GameID" to join a game. If a game by the given GameID exists you join that, otherwise a new game is created.'
+  const sendJoinMessage = id => {
+    socket.to(id).emit('chat message', {
+      sender: 'liracer',
+      content: 'Player joined'
+    })
+  }
+
+  const sendCurrentSnippetMessage = id => {
+    io.to(id).emit('chat message', {
+      sender: 'liracer',
+      content: `The current snippet is ${games[id].snippet.name}`
+    })
+  }
+
+  socket.on('disconnecting', () => sendLeaveMessage(gameID))
+
+  socket.on('join game', id => {
+    socket.leave(gameID)
+    sendLeaveMessage(gameID)
+
+    socket.join(id)
+    if(games[id]) {
+      sendJoinMessage(id)
+    } else {
+      // Create game
+      games[id] = {
+        snippet: randomSnippet()
+      }
+      sendCurrentSnippetMessage(id)
+    }
+
+    gameID = id
+    socket.emit('code snippet', games[id].snippet.code)
   })
 
-  useNewSnippet()
-
   socket.on('cursor position update', position => {
-    console.log(`client on position ${position}`)
-
-    if(snippet.code.length === position) {
-      useNewSnippet()
+    const game = games[gameID]
+    if(game && position === game.snippet.code.length) {
+      game.snippet = randomSnippet()
+      sendCurrentSnippetMessage(gameID)
+      io.to(gameID).emit('code snippet', games[gameID].snippet.code)
     }
   })
 })
