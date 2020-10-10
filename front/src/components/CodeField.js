@@ -53,7 +53,7 @@ const CodeField = (props) => {
   return (
     <Window>
       {
-        !props.code ? 'Loading code' : (
+        props.code && (
           <Pre onKeyDown={handleKeyDown} tabIndex='0'>
             {
               props.code.split('').map((char, index) => {
