@@ -6,6 +6,7 @@ const options = {
 }
 const io = require('socket.io')(server, options)
 
+// The frontend assumes that the backend is on same port as backend in production and on port 3101 otherwise
 const port = process.env.PORT || 3101
 const buildPath = `${__dirname}/front/build`
 
@@ -19,22 +20,33 @@ const randomSnippet = () => snippets[Math.floor(snippets.length * Math.random())
 
 const games = {}
 
-const generatePseudoRandomString = _ => Math.random().toString(36).replace(/[^a-z]+/g, '')
+const createPseudoRandomString = _ => Math.random().toString(36).replace(/[^a-z]+/g, '')
+const createGame = _ => ({
+  snippet: randomSnippet(),
+  roundID: createPseudoRandomString()
+})
 
 io.on('connection', socket => {
   let gameID
 
-  const sendLeaveMessage = id => {
+  const sendPlayerLeftMessage = id => {
     io.to(id).emit('chat message', {
       sender: 'liracer',
       content: 'Player left'
     })
   }
 
-  const sendJoinMessage = id => {
+  const sendPlayerJoinedMessage = id => {
     socket.to(id).emit('chat message', {
       sender: 'liracer',
       content: 'Player joined'
+    })
+  }
+
+  const sendGameCreatedMessage = id => {
+    io.to(id).emit('chat message', {
+      sender: 'liracer',
+      content: 'Game created'
     })
   }
 
@@ -45,21 +57,18 @@ io.on('connection', socket => {
     })
   }
 
-  socket.on('disconnecting', () => sendLeaveMessage(gameID))
+  socket.on('disconnecting', () => sendPlayerLeftMessage(gameID))
 
   socket.on('join game', id => {
     socket.leave(gameID)
-    sendLeaveMessage(gameID)
+    sendPlayerLeftMessage(gameID)
 
     socket.join(id)
     if(games[id]) {
-      sendJoinMessage(id)
+      sendPlayerJoinedMessage(id)
     } else {
-      // Create game
-      games[id] = {
-        snippet: randomSnippet(),
-        roundID: generatePseudoRandomString()
-      }
+      sendGameCreatedMessage(id)
+      games[id] = createGame()
       sendCurrentSnippetMessage(id)
     }
 
@@ -85,7 +94,7 @@ io.on('connection', socket => {
 
     if(position === game.snippet.code.length) {
       game.snippet = randomSnippet()
-      game.roundID = generatePseudoRandomString()
+      game.roundID = createPseudoRandomString()
       sendCurrentSnippetMessage(gameID)
       io.to(gameID).emit('game state', game)
     }
