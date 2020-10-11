@@ -26,7 +26,8 @@ background: ${colors.layer0Background}
 `
 
 function App() {
-  const [code, setCode] = useState()
+  const [snippet, setSnippet] = useState()
+  const [roundID, setRoundID] = useState()
   const [cursorPosition, setCursorPosition] = useState()
   const [wrongChars, setWrongChars] = useState()
   const [messages, setMessages] = useState([])
@@ -47,8 +48,9 @@ function App() {
       return
     }
 
-    socket.on('code snippet', (code) => {
-      setCode(code)
+    socket.on('game state', (game) => {
+      setSnippet(game.snippet)
+      setRoundID(game.roundID)
       setCursorPosition(0)
       setWrongChars(0)
     })
@@ -63,8 +65,11 @@ function App() {
       return
     }
 
-    socket.emit('cursor position update', cursorPosition)
-  }, [socket, cursorPosition])
+    socket.emit('cursor position update', {
+      position: cursorPosition,
+      roundID
+    })
+  }, [roundID, socket, cursorPosition])
 
   return isMobile(window.navigator).any ? (
     <div>
@@ -75,7 +80,7 @@ function App() {
     <Grid>
       <ChatAndJoinButton messages={ messages }
                          joinGame={ joinGame }/>
-      <CodeField code={ code }
+      <CodeField snippet={ snippet }
                  cursorPosition={cursorPosition}
                  setCursorPosition={setCursorPosition}
                  wrongChars={wrongChars}

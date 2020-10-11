@@ -1,36 +1,3 @@
-// const InputContainer = styled.div`
-//   background: ${colors.layer2Background};
-//   flex-basis: auto;
-//   display: flex;
-//   height: 50px;
-//   padding: calc(1rem / 2);
-//   box-sizing: border-box;
-// `
-
-// const JoinButtonContainer = styled.div`
-//   background: ${colors.layer2Background};
-//   flex-basis: 90px;
-//   padding-left: 1em;
-// `
-
-// const JoinButton = styled.button`
-//   :hover {
-  //     background: ${colors.layer2Background};
-  //     color: ${colors.layer2Foreground};
-  //   }
-  //   background: ${colors.layer1Background};
-  //   color: ${colors.layer1Foreground};
-  //   transition-duration: 0.12s;
-  //   height: 100%;
-  //   width: 100%;
-  //   font-weight: bold;
-  //   font-size: 14px;
-  //   padding: 0;
-//   border: solid ${colors.layer2Background} 0;
-//   border-radius: 5px;
-//   cursor: pointer;
-//   outline: none;
-// `
 import React from 'react'
 import Window from './Window'
 import Messages from './Messages'

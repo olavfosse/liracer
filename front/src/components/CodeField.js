@@ -34,7 +34,7 @@ const CodeField = (props) => {
 
     const char = mapKeyToChar(event.key)
     if(char) {
-      if (props.wrongChars === 0 && props.code[props.cursorPosition] === char){
+      if (props.wrongChars === 0 && props.snippet.code[props.cursorPosition] === char){
         props.setCursorPosition(props.cursorPosition + 1)
       } else {
         props.setWrongChars(props.wrongChars + 1)
@@ -53,10 +53,10 @@ const CodeField = (props) => {
   return (
     <Window>
       {
-        props.code && (
+        props.snippet && (
           <Pre onKeyDown={handleKeyDown} tabIndex='0'>
             {
-              props.code.split('').map((char, index) => {
+              props.snippet.code.split('').map((char, index) => {
                 const isOnCursor = index === props.cursorPosition
                 const isOnLastWrongChar = props.wrongChars > 0 && index === props.cursorPosition + props.wrongChars - 1
                 const isOnWrongChar = index >= props.cursorPosition && index < props.cursorPosition + props.wrongChars
