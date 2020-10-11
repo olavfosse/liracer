@@ -1,6 +1,5 @@
 # liracer-rewrite
 ## Setup
-To setup the backend
 ```sh
 # Backend
 npm install &&
