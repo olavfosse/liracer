@@ -37,7 +37,7 @@ io.on('connection', socket => {
   }
 
   const sendPlayerJoinedMessage = id => {
-    socket.to(id).emit('chat message', {
+    io.to(id).emit('chat message', {
       sender: 'liracer',
       content: 'Player joined'
     })
