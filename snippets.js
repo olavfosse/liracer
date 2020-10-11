@@ -34,7 +34,7 @@ const enforceNoSpaceIndentation = (snippets) => {
   snippets.forEach(snippet => {
     snippet.code.split('\n').forEach((line, index) => {
       if(line.startsWith(' ')) {
-        const path = getProgramPath(snippet.language, snippet.program)
+        const path = getProgramPath(snippet.language, snippet.name)
         console.error(`ERROR: Found space indentation at ${path}:${index + 1}`)
         process.exit(1)
       }
@@ -58,7 +58,7 @@ const enforceNoExcessNewline = (snippets) => {
   snippets.forEach(snippet => {
     const index = snippet.code.length - 1
     if(snippet.code[index] === '\n'){
-      const path = getProgramPath(snippet.language, snippet.program)
+      const path = getProgramPath(snippet.language, snippet.name)
       console.error(`ERROR: Found excess newline at ${path}:${index + 1}`)
       process.exit(1)
     }
