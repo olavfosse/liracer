@@ -71,8 +71,8 @@ const ChatAndJoinButton = (props) => {
     <Window>
       <FlexBox>
         <Messages messages={props.messages}/>
-        <ChatForm onSubmit={event => event.preventDefault()}>
-          <ChatInput />
+        <ChatForm onSubmit={props.handleSendMessage}>
+          <ChatInput name='input' />
           <ChatSubmit>SEND</ChatSubmit>
         </ChatForm>
         <JoinButtonContainer>

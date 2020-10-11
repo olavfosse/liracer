@@ -35,6 +35,13 @@ function App() {
 
   const joinGame = gameID => socket.emit('join game', gameID)
 
+  const handleSendMessage = event => {
+    event.preventDefault()
+
+    socket.emit('chat message', event.target.input.value)
+    event.target.input.value = ''
+  }
+
   useEffect(() => {
     if(process.env.NODE_ENV !== 'production') {
       setSocket(io('http://localhost:3101'))
@@ -79,7 +86,8 @@ function App() {
   ) : (
     <Grid>
       <ChatAndJoinButton messages={ messages }
-                         joinGame={ joinGame }/>
+                         joinGame={ joinGame }
+                         handleSendMessage={handleSendMessage}/>
       <CodeField snippet={ snippet }
                  cursorPosition={cursorPosition}
                  setCursorPosition={setCursorPosition}

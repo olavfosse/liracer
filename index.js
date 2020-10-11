@@ -97,6 +97,13 @@ io.on('connection', socket => {
       io.to(gameID).emit('game state', games[gameID])
     }
   })
+
+  socket.on('chat message', content => {
+    io.to(gameID).emit('chat message', {
+      sender: 'anon',
+      content
+    })
+  })
 })
 
 console.log(`listening on ${port}`)
