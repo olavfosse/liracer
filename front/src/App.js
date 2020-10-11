@@ -15,6 +15,12 @@ bottom: 0;
 right: 0;
 overflow: auto;
 
+// Makes Pre take up the proper amount of space on Safari
+// DON'T TOUCH
+height: 100%;
+box-sizing: border-box;
+// DON'T TOUCH
+
 // Use a grid layout
 display: grid;
 grid-template-columns: minmax(300px, 500px) minmax(750px, auto);
