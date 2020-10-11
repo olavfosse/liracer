@@ -30,17 +30,17 @@ const createGame = _ => ({
 io.on('connection', socket => {
   let gameID
 
-  const sendPlayerLeftMessage = id => {
+  const sendAnonLeftMessage = id => {
     io.to(id).emit('chat message', {
       sender: 'liracer',
-      content: 'Player left'
+      content: 'anon left'
     })
   }
 
-  const sendPlayerJoinedMessage = id => {
+  const sendAnonJoinedMessage = id => {
     io.to(id).emit('chat message', {
       sender: 'liracer',
-      content: 'Player joined'
+      content: 'anon joined'
     })
   }
 
@@ -69,16 +69,16 @@ io.on('connection', socket => {
 
   socket.on('disconnecting', () => {
     clearCursor(gameID)
-    sendPlayerLeftMessage(gameID)
+    sendAnonLeftMessage(gameID)
   })
 
   socket.on('join game', id => {
     socket.leave(gameID)
-    sendPlayerLeftMessage(gameID)
+    sendAnonLeftMessage(gameID)
 
     socket.join(id)
     if(games[id]) {
-      sendPlayerJoinedMessage(id)
+      sendAnonJoinedMessage(id)
     } else {
       sendGameCreatedMessage(id)
       games[id] = createGame()
