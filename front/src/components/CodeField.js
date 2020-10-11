@@ -10,6 +10,8 @@ const Pre = styled.pre`
   margin: 0;
   color: ${colors.layer1Foreground};
   outline: none;
+  box-sizing: border-box;
+  height: 100%;
 `
 
 const mapKeyToChar = (key) => {
