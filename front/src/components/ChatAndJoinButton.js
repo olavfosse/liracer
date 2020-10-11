@@ -76,7 +76,7 @@ const ChatAndJoinButton = (props) => {
           <ChatSubmit>SEND</ChatSubmit>
         </ChatForm>
         <JoinButtonContainer>
-          <JoinButton onClick={() => props.joinGame(prompt('GameID'))}>
+          <JoinButton onClick={props.handleClickJoinGame}>
             JOIN GAME
           </JoinButton>
         </JoinButtonContainer>

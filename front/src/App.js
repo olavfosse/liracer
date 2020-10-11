@@ -33,7 +33,13 @@ function App() {
   const [messages, setMessages] = useState([])
   const [socket, setSocket] = useState()
 
-  const joinGame = gameID => socket.emit('join game', gameID)
+  const handleClickJoinGame = _ => {
+    const gameID = prompt('GameID')
+    if(gameID !== null && gameID !== '') {
+      socket.emit('join game', gameID)
+      history.pushState(undefined, undefined, gameID) // eslint-disable-line no-restricted-globals
+    }
+  }
 
   const handleSendMessage = event => {
     event.preventDefault()
@@ -41,6 +47,31 @@ function App() {
     socket.emit('chat message', event.target.input.value)
     event.target.input.value = ''
   }
+
+  const parseGameIDFromLocation = location => decodeURI(location.pathname).slice(1)
+
+  window.onpopstate = event => {
+    const gameID = parseGameIDFromLocation(event.target.location)
+    socket.emit('join game', gameID)
+    history.replaceState(undefined, undefined, gameID) // eslint-disable-line no-restricted-globals
+  }
+
+  const createPseudoRandomString = _ => Math.random().toString(36).replace(/[^a-z]+/g, '')
+  useEffect(() => {
+    if(!socket){
+      return
+    }
+
+    if(window.location.pathname === '/') {
+      const gameID = createPseudoRandomString()
+      socket.emit('join game', gameID)
+      history.replaceState(undefined, undefined, gameID) // eslint-disable-line no-restricted-globals
+    } else {
+      const gameID = parseGameIDFromLocation(window.location)
+      socket.emit('join game', gameID)
+      history.pushState(undefined, undefined, gameID) // eslint-disable-line no-restricted-globals
+    }
+  }, [socket])
 
   useEffect(() => {
     if(process.env.NODE_ENV !== 'production') {
@@ -86,7 +117,7 @@ function App() {
   ) : (
     <Grid>
       <ChatAndJoinButton messages={ messages }
-                         joinGame={ joinGame }
+                         handleClickJoinGame={ handleClickJoinGame }
                          handleSendMessage={handleSendMessage}/>
       <CodeField snippet={ snippet }
                  cursorPosition={cursorPosition}
