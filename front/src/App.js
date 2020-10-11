@@ -29,6 +29,7 @@ function App() {
   const [snippet, setSnippet] = useState()
   const [roundID, setRoundID] = useState()
   const [cursorPosition, setCursorPosition] = useState()
+  const [opponentCursorPositions, setOpponentCursorPositions] = useState({})
   const [wrongChars, setWrongChars] = useState()
   const [messages, setMessages] = useState([])
   const [socket, setSocket] = useState()
@@ -91,10 +92,18 @@ function App() {
       setRoundID(game.roundID)
       setCursorPosition(0)
       setWrongChars(0)
+      setOpponentCursorPositions({})
     })
 
     socket.on('chat message', message => {
       setMessages(messages => [...messages, message])
+    })
+
+    socket.on('cursor position update', ({
+      sid, // socket id, identifies the player/client
+      position
+    }) => {
+      setOpponentCursorPositions(opponentCursorPositions => ({...opponentCursorPositions, [sid]: position }))
     })
   }, [socket])
 
@@ -121,6 +130,7 @@ function App() {
                          handleSendMessage={handleSendMessage}/>
       <CodeField snippet={ snippet }
                  cursorPosition={cursorPosition}
+                 opponentCursorPositions={opponentCursorPositions}
                  setCursorPosition={setCursorPosition}
                  wrongChars={wrongChars}
                  setWrongChars={setWrongChars} />

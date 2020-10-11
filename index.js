@@ -1,3 +1,4 @@
+const { clear } = require('console')
 const express = require('express')
 const app = express()
 const server = require('http').createServer(app)
@@ -57,7 +58,19 @@ io.on('connection', socket => {
     })
   }
 
-  socket.on('disconnecting', () => sendPlayerLeftMessage(gameID))
+  const clearCursor = id => {
+    // This is kind of hackish
+    // If position is -1 it won't be rendered, and it will be cleared from front end memory on 'game state' message
+    socket.to(id).emit('cursor position update', {
+      sid: socket.id,
+      position: -1
+    })
+  }
+
+  socket.on('disconnecting', () => {
+    clearCursor(gameID)
+    sendPlayerLeftMessage(gameID)
+  })
 
   socket.on('join game', id => {
     socket.leave(gameID)
@@ -92,9 +105,16 @@ io.on('connection', socket => {
     }
 
     if(position === games[gameID].snippet.code.length) {
+      // New game
       games[gameID] = createGame()
       sendCurrentSnippetMessage(gameID)
       io.to(gameID).emit('game state', games[gameID])
+    } else {
+      // Send cursor position update to other players
+      socket.to(gameID).emit('cursor position update', {
+        sid: socket.id,
+        position
+      })
     }
   })
 
