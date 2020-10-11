@@ -87,16 +87,14 @@ io.on('connection', socket => {
   //   therefore the position sent is representative of how much of new 'code snippet' user2 has actually typed.
   //   worst case scenario the inaccurate position user2 sent matches the length of the new code snippet causing user2 to instantly win the round.
   socket.on('cursor position update', ({ position, roundID }) => {
-    const game = games[gameID]
-    if(game.roundID !== roundID) { // See the wall of text above :^)
+    if(games[gameID].roundID !== roundID) { // See the wall of text above :^)
       return
     }
 
-    if(position === game.snippet.code.length) {
-      game.snippet = randomSnippet()
-      game.roundID = createPseudoRandomString()
+    if(position === games[gameID].snippet.code.length) {
+      games[gameID] = createGame()
       sendCurrentSnippetMessage(gameID)
-      io.to(gameID).emit('game state', game)
+      io.to(gameID).emit('game state', games[gameID])
     }
   })
 })
