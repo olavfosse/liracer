@@ -24,7 +24,8 @@ const games = {}
 const createPseudoRandomString = _ => Math.random().toString(36).replace(/[^a-z]+/g, '')
 const createGame = _ => ({
   snippet: randomSnippet(),
-  roundID: createPseudoRandomString()
+  roundID: createPseudoRandomString(),
+  startingTime: new Date().getTime()
 })
 
 io.on('connection', socket => {
@@ -55,6 +56,14 @@ io.on('connection', socket => {
     io.to(id).emit('chat message', {
       sender: 'liracer',
       content: `The current snippet is ${games[id].snippet.name}`
+    })
+  }
+
+  const sendSnippetCompletedMessage = id => {
+    const timeToComplete = (new Date().getTime() - games[id].startingTime) / 1000
+    io.to(id).emit('chat message', {
+      sender: 'liracer',
+      content : `${games[id].snippet.name} completed in ${timeToComplete} seconds`
     })
   }
 
@@ -106,6 +115,7 @@ io.on('connection', socket => {
 
     if(position === games[gameID].snippet.code.length) {
       // New game
+      sendSnippetCompletedMessage(gameID)
       games[gameID] = createGame()
       sendCurrentSnippetMessage(gameID)
       io.to(gameID).emit('game state', games[gameID])
