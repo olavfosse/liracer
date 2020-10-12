@@ -95,10 +95,12 @@ function App() {
 
     socket.on('game state', (game) => {
       setSnippet(game.snippet)
-      setRoundID(game.roundID)
-      setCursorPosition(0)
       setWrongChars(0)
       setOpponentCursorPositions({})
+      setCursorPosition(0)
+
+      // It is crucial that the roundID is updated after the cursor is set to 0
+      setRoundID(game.roundID)
     })
 
     socket.on('chat message', message => {
