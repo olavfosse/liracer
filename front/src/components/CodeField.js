@@ -76,7 +76,7 @@ const CodeField = (props) => {
 
                 // Visualize newlines, by using the ↵ character
                 // Only show ↵ when the cursor, or wrongChars markings is on newline
-                if(char === "\n" && (isOnLastWrongChar || (isOnPlayerCursor && !isOnWrongChar))) {
+                if(char === "\n" && (isOnLastWrongChar || isOnOpponentCursor || (isOnPlayerCursor && !isOnWrongChar))) {
                   char = "↵\n"
                 }
 
