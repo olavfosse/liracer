@@ -12,4 +12,4 @@ def stringToAscii(string):
 
 	return message;
 
-print(stringToAscii(originalString))
+print(stringToAscii(originalString));
