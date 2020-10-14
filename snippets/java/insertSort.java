@@ -1,4 +1,4 @@
-public static void insertionSort(int[] array) {
+public static void insertion_sort(int[] array) {
 	for (int i = 1; i < array.length; i++) {
 		int current = array[i];
 		int j = i - 1;

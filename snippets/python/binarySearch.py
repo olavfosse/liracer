@@ -1,17 +1,17 @@
-def doSearch(array, targetValue): 
-	min = 0;
-	max = array.length - 1;
-	NOfGuesses = 0;
+def do_search(array, target_value): 
+	min = 0
+	max = array.length - 1
+	N_of_guesses = 0
 
 	while max >= min:
 		guess = int((min + max) / 2);
-		NOfGuesses+= 1
-		if array[guess] == targetValue:
-			print(NOfGuesses);
-			return guess;
-		elif array[guess] < targetValue:
-			min = guess + 1;
+		N_of_guesses+= 1
+		if array[guess] == target_value:
+			print(N_of_guesses);
+			return guess
+		elif array[guess] < target_value:
+			min = guess + 1
 		else:
-			max = guess - 1;
+			max = guess - 1
 
-	return -1;
+	return -1
