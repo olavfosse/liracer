@@ -1,15 +1,15 @@
 originalString = "Test"
 
-def stringToAscii(string):
-	NumberDec = []
+def string_to_ascii(string):
+	number_dec = []
 	for i in string:
-		NumberDec.append(ord(i))
+		number_dec.append(ord(i))
 	message = ""
 	message += "Decimal numbers: "
-	for i in NumberDec:
+	for i in number_dec:
 		message += str(i) + ", "
 	message += "\n"
 
-	return message;
+	return message
 
-print(stringToAscii(originalString));
+print(string_to_ascii(originalString))

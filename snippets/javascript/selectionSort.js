@@ -1,4 +1,4 @@
-function selectionSort(arr) {
+function selection_sort(arr) {
 	const swap = (arr, index1, index2) =>
 	  ([arr[index1], arr[index2]] = [arr[index2], arr[index1]]);
 	
@@ -15,5 +15,5 @@ function selectionSort(arr) {
 	return arr;
 }
 
-const myArray = [0,4,22,45,12,15,17]
+const myArray = [0,4,22,45,12,15,17];
 selectionSort(myArray);
