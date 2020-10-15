@@ -11,6 +11,7 @@ The easiest way to contribute is to submit a code snippet. The snippets are stor
 - Be *interesting*. The code should either display the syntax of a language with a familiar, easily digestible example such as [fibonacci.cpp](https://github.com/olav35/liracer-rewrite/blob/master/snippets/c%2B%2B/fibonacci.cpp), [hello_world.hs](https://github.com/olav35/liracer-rewrite/blob/master/snippets/haskell/hello_world.hs) or [fibonacci_sequence.rb](https://github.com/olav35/liracer-rewrite/blob/master/snippets/ruby/fibonacci_sequence.rb), or be a real-life example.
 - Be valid code. The code does not need to be self sufficient, but no syntax errors should be present.
 - Be legitimate contributions(not spam garbage).
+- Make sure to name scripts according to their respective language naming conventions.
 
 For a start you can translate an already existing quote to a new language.
 
