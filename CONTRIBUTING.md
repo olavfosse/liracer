@@ -35,3 +35,6 @@ For a start you can translate an already existing quote to a new language.
 - Use snake_case for files, functions and variable.
 #### Ruby
 - Use snake_case for files, methods and variables.
+
+## Other
+There are of course other ways to contribute too. If you run into an issue or have an idea for the project feel free to submit them in the [issue tracker](https://github.com/olav35/liracer-rewrite/issues). You can also try implementing the feature requests or fixing the issues there. Make sure to say that you are working on it, to prevent multiple people doing the same work.
