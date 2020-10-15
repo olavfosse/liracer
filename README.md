@@ -1,5 +1,5 @@
-# liracer-rewrite
-A rewrite of liracer, the free and open source code racing game.
+# liracer
+The free and open source code racing game.
 
 ## Contribute
 See [CONTRIBUTING.md](CONTRIBUTING.md)
