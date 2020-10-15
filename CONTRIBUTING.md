@@ -2,7 +2,7 @@
 Thanks for taking the time to contribute.
 
 ## Snippets
-The easiest way to contribute is to submit a code snippet. The snippets are stored in [snippets/<language>](snippets/). They need to fullfil the following requirements. **Please ensure that these requirements are met before submitting a pull request.**
+The easiest way to contribute is to submit a code snippet. The snippets are stored in [snippets/<language>](snippets/). They need to fullfil the following requirements. **Please ensure that these requirements are met before submitting a pull request. I receive a lot of PRs and may simply close non-conforming PRs with no comment.**
 - Use literal tabs(not spaces) for indention.
 - Have maximum 79 characters per line.
 - Have no trailing newline.
