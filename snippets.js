@@ -46,7 +46,7 @@ const enforceMaxium79CharactersPerLine = (snippets) => {
   snippets.forEach(snippet => {
     snippet.code.split('\n').forEach((line, index) => {
       if(line.length > 79) {
-        const path = getProgramPath(snippet.language, snippet.program)
+        const path = getProgramPath(snippet.language, snippet.name)
         console.error(`ERROR: Found line with more than 79 characters at ${path}:${index + 1}`)
         process.exit(1)
       }
