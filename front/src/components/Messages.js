@@ -1,6 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import colors from '../colors'
+import './ToolTip.css'
 
 const MessageDiv = styled.div`
   // Make it easy to visually differentiate messages
@@ -8,10 +9,12 @@ const MessageDiv = styled.div`
 `
 
 const Message = (props) => {
+  console.log(props.message.playerID)
   return (
-    <MessageDiv>
+    <MessageDiv className="tooltip">
       {/* IMPORTANT SPACE --> */}
-      <b>&lt;{props.message.sender}&gt;</b> <span>{props.message.content}</span>
+      <b>&lt;{props.message.sender}&gt;</b> {props.message.content}
+      <span className={props.message.playerID ? 'tooltiptext' : ''}>{props.message.playerID}</span>
     </MessageDiv>
   )
 }

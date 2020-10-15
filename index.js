@@ -95,6 +95,7 @@ io.on('connection', socket => {
     }
 
     gameID = id
+    socket.emit('player id', socket.id) //Send player's id to client when joining the game. Improvement idea: attatch a static player ID for everygame 
     socket.emit('game state', games[id])
   })
 
@@ -128,10 +129,11 @@ io.on('connection', socket => {
     }
   })
 
-  socket.on('chat message', content => {
+  socket.on('chat message', (playerID, content) => { //When client emits 'chat-message', server also receives the playerID and send it back to the client
     io.to(gameID).emit('chat message', {
       sender: 'anon',
-      content
+      content,
+      playerID: playerID
     })
   })
 })
