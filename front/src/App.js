@@ -37,7 +37,7 @@ function App() {
   const [cursorPosition, setCursorPosition] = useState()
   const [opponentCursorPositions, setOpponentCursorPositions] = useState({})
   const [wrongChars, setWrongChars] = useState()
-  const [dataMessages, setDataMessages] = useState([]) //An array contains objects with structure {sender: sender, content: content, playerID: playerID}
+  const [messages, setMessages] = useState([]) //An array contains objects with structure {sender: sender, content: content, playerID: playerID}
   const [socket, setSocket] = useState()
   const [playerID, setPlayerID] = useState() // Player ID will store here to use when send a message
 
@@ -52,7 +52,7 @@ function App() {
   const handleSendMessage = event => {
     event.preventDefault()
 
-    socket.emit('chat message', playerID, event.target.input.value) //playerID is taken from the state
+    socket.emit('chat message', event.target.input.value) //playerID is taken from the state
     event.target.input.value = ''
   }
 
@@ -104,12 +104,9 @@ function App() {
       setRoundID(game.roundID)
     })
 
-    socket.on('player id', (playerID) => {
-      setPlayerID(playerID)
-    })
 
     socket.on('chat message', (content) => {
-      setDataMessages( dataMessages => [...dataMessages, 
+      setMessages( messages => [...messages, 
           content
       ])
     })
@@ -140,7 +137,7 @@ function App() {
     </div>
   ) : (
     <Grid>
-      <ChatAndJoinButton messages={ dataMessages }
+      <ChatAndJoinButton messages={ messages }
                          handleClickJoinGame={ handleClickJoinGame }
                          handleSendMessage={handleSendMessage}/>
       <CodeField snippet={ snippet }
