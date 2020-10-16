@@ -38,7 +38,7 @@ const Message = (props) => {
   return (
     <MessageDiv>
       {/* IMPORTANT SPACE --> */}
-      <b>&lt;{props.message.sender}&gt;</b> {props.message.content}
+      <b>&lt;{props.message.sender}&gt;</b> <span>{props.message.content}</span>
       {props.message.playerID ? <ToolTipText>{props.message.playerID}</ToolTipText> : ''}
     </MessageDiv>
   )
