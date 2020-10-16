@@ -1,15 +1,18 @@
 import React from 'react'
 import styled from 'styled-components'
 import colors from '../colors'
-import './ToolTip.css'
 
 const ToolTipText = styled.span`
   visibility: hidden;
-  background-color: black;
-  color: #fff;
+  background-color: ${colors.layer1Background};
+  color: ${colors.layer1Foreground};
+  font-weight: 600;
   text-align: center;
   border-radius: 6px;
+  border-color: ${colors.layer2Background};
+  border-style: solid;
   padding: 5px 0px;
+  width: 80%;
   left:0;
   top:20px;
   opacity: 0.8;
