@@ -28,11 +28,7 @@ const mapKeyToChar = (key) => {
 
 const CodeField = (props) => {
   const handleKeyDown = (event) => {
-    // Include description of why the key needs to be preventDefaulted.
-    const preventDefaultKeys = [
-      'Tab' // Iterates through ui elements on Chrome, Firefox
-    ]
-    preventDefaultKeys.includes(event.key) && event.preventDefault()
+    event.preventDefault()
 
     const char = mapKeyToChar(event.key)
     if(char) {
