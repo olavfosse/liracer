@@ -129,11 +129,11 @@ io.on('connection', socket => {
     }
   })
 
-  socket.on('chat message', (playerID, content) => { //When client emits 'chat-message', server also receives the playerID and send it back to the client
+  socket.on('chat message', (content) => { 
     io.to(gameID).emit('chat message', {
       sender: 'anon',
       content,
-      playerID: playerID
+      playerID: socket.id // Server send player ID that connect to the socket
     })
   })
 })
