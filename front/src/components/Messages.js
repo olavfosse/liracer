@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import styled from 'styled-components'
 import colors from '../colors'
 
@@ -29,11 +29,18 @@ const MessagesDiv = styled.div`
 `
 
 const Messages = (props) => {
+  const messagesEndRef = useRef(null)
+
+  useEffect(() => {
+    messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
+  }, [props.messages])
+
   return (
     <MessagesDiv>
       {
         props.messages.map((message, index) => <Message key={index} message={ message }/>)
       }
+      <div ref={messagesEndRef} />
     </MessagesDiv>
   )
 }
