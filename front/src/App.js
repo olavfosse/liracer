@@ -37,7 +37,7 @@ function App() {
   const [cursorPosition, setCursorPosition] = useState()
   const [opponentCursorPositions, setOpponentCursorPositions] = useState({})
   const [wrongChars, setWrongChars] = useState()
-  const [messages, setMessages] = useState([])
+  const [messages, setMessages] = useState([]) // message content, sender name and optionally playerID
   const [socket, setSocket] = useState()
 
   const handleClickJoinGame = _ => {
@@ -103,8 +103,11 @@ function App() {
       setRoundID(game.roundID)
     })
 
-    socket.on('chat message', message => {
-      setMessages(messages => [...messages, message])
+
+    socket.on('chat message', (content) => {
+      setMessages( messages => [...messages, 
+          content
+      ])
     })
 
     socket.on('cursor position update', ({

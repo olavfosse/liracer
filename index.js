@@ -128,10 +128,11 @@ io.on('connection', socket => {
     }
   })
 
-  socket.on('chat message', content => {
+  socket.on('chat message', (content) => { 
     io.to(gameID).emit('chat message', {
       sender: 'anon',
-      content
+      content,
+      playerID: socket.id // Server send player ID that connect to the socket
     })
   })
 })
