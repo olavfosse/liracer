@@ -24,22 +24,19 @@ const ToolTipText = styled.span`
 
 const MessageDiv = styled.div`
   // Make it easy to visually differentiate messages
-  &{
-    padding-bottom: 7px;
-    position: relative;
-  }
+  padding-bottom: 7px;
+  position: relative;
   &:hover ${ToolTipText} {
     visibility: visible;
   }
 `
 
 const Message = (props) => {
-  console.log(props.message.playerID)
   return (
     <MessageDiv>
-      {/* IMPORTANT SPACE --> */}
+      {/* IMPORTANT SPACE               --> */}
       <b>&lt;{props.message.sender}&gt;</b> <span>{props.message.content}</span>
-      {props.message.playerID ? <ToolTipText>{props.message.playerID}</ToolTipText> : ''}
+      {props.message.playerID && <ToolTipText>{props.message.playerID}</ToolTipText>}
     </MessageDiv>
   )
 }

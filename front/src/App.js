@@ -37,9 +37,8 @@ function App() {
   const [cursorPosition, setCursorPosition] = useState()
   const [opponentCursorPositions, setOpponentCursorPositions] = useState({})
   const [wrongChars, setWrongChars] = useState()
-  const [messages, setMessages] = useState([]) //An array contains objects with structure {sender: sender, content: content, playerID: playerID}
+  const [messages, setMessages] = useState([]) // message content, sender name and optionally playerID
   const [socket, setSocket] = useState()
-  const [playerID, setPlayerID] = useState() // Player ID will store here to use when send a message
 
   const handleClickJoinGame = _ => {
     const gameID = prompt('GameID')
@@ -52,7 +51,7 @@ function App() {
   const handleSendMessage = event => {
     event.preventDefault()
 
-    socket.emit('chat message', event.target.input.value) //playerID is taken from the state
+    socket.emit('chat message', event.target.input.value)
     event.target.input.value = ''
   }
 

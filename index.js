@@ -95,7 +95,6 @@ io.on('connection', socket => {
     }
 
     gameID = id
-    socket.emit('player id', socket.id) //Send player's id to client when joining the game. Improvement idea: attatch a static player ID for everygame 
     socket.emit('game state', games[id])
   })
 
