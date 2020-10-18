@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import colors from '../colors'
 
@@ -55,14 +55,21 @@ const MessagesDiv = styled.div`
 
 
 const Messages = (props) => {
+  const [isNavigationMode, setNavigationMode] = useState()
   const messagesEndRef = useRef(null)
 
   useEffect(() => {
-    messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
+    !isNavigationMode && messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
   }, [props.messages])
 
+  const handleScroll = (scrollEvent) => {
+      var element = scrollEvent.currentTarget
+      var isBottom = element.scrollTop + element.offsetHeight === element.scrollHeight
+      isBottom ? setNavigationMode(false) : setNavigationMode(true)
+  }
+
   return (
-    <MessagesDiv>
+    <MessagesDiv onScroll={handleScroll}>
       {
         props.messages.map((message, index) => <Message key={index} message={message} />)
       }
