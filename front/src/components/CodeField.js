@@ -1,4 +1,5 @@
 import React from 'react'
+import { useState } from 'react'
 import Window from './Window'
 import styled from 'styled-components'
 import colors from '../colors'
@@ -27,6 +28,8 @@ const mapKeyToChar = (key) => {
 }
 
 const CodeField = (props) => {
+  const [isCodeFieldFocused, setCodeFieldFocused] = useState()
+
   const handleKeyDown = (event) => {
     event.preventDefault()
 
@@ -48,22 +51,31 @@ const CodeField = (props) => {
     }
   }
 
+  const handleBlur = () => setCodeFieldFocused(false)
+
+  const handleFocus = () => setCodeFieldFocused(true)
+
   return (
     <Window>
       {
         props.snippet && (
-          <Pre onKeyDown={handleKeyDown} tabIndex='0'>
+          <Pre onKeyDown={handleKeyDown} tabIndex='0' onBlur={handleBlur} onFocus={handleFocus}>
             {
               props.snippet.code.split('').map((char, index) => {
                 const isOnPlayerCursor = index === props.cursorPosition
                 const isOnOpponentCursor = Object.values(props.opponentCursorPositions).some(position => position === index)
                 const isOnLastWrongChar = props.wrongChars > 0 && index === props.cursorPosition + props.wrongChars - 1
                 const isOnWrongChar = index >= props.cursorPosition && index < props.cursorPosition + props.wrongChars
+                const isOnLastChar = isOnLastWrongChar || (!isOnWrongChar && isOnPlayerCursor)
+                const isOnPlayerCursorInactive = !isCodeFieldFocused && isOnLastChar
+                const isOnPlayerCursorActive = isCodeFieldFocused && isOnPlayerCursor
 
                 let style = {}
 
                 isOnOpponentCursor && (style.background = colors.opponentCursorColor)
-                isOnPlayerCursor && (style.background = colors.playerCursorColor)
+                isOnPlayerCursorInactive && (style.outline = 'inset 1px')
+                isOnPlayerCursorActive && (style.background = colors.playerCursorColor)
+                isOnLastChar && (style.borderBottomStyle = 'solid')
 
                 if(props.wrongChars > 0) {
                   if(isOnWrongChar)
@@ -72,7 +84,7 @@ const CodeField = (props) => {
 
                 // Visualize newlines, by using the ↵ character
                 // Only show ↵ when the cursor, or wrongChars markings is on newline
-                if(char === "\n" && (isOnLastWrongChar || isOnOpponentCursor || (isOnPlayerCursor && !isOnWrongChar))) {
+                if(char === "\n" && (isOnLastChar || isOnOpponentCursor)) {
                   char = "↵\n"
                 }
 
