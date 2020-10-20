@@ -5,6 +5,7 @@ import io from 'socket.io-client'
 import isMobile from 'ismobilejs'
 import ChatAndJoinButton from './components/ChatAndJoinButton'
 import CodeField from './components/CodeField'
+import Constants from './utils/constants';
 import colors from './colors'
 const Grid = styled.div`
 // Consume the entire viewport
@@ -39,10 +40,11 @@ function App() {
   const [wrongChars, setWrongChars] = useState()
   const [messages, setMessages] = useState([]) // message content, sender name and optionally playerID
   const [socket, setSocket] = useState()
+  const [countdownUntilStart, setCountdownUntilStart] = useState(-1)
 
   const handleClickJoinGame = _ => {
     const gameID = prompt('GameID')
-    if(gameID !== null && gameID !== '') {
+    if (gameID !== null && gameID !== '') {
       socket.emit('join game', gameID)
       history.pushState(undefined, undefined, gameID) // eslint-disable-line no-restricted-globals
     }
@@ -64,12 +66,29 @@ function App() {
   }
 
   const createPseudoRandomString = _ => Math.random().toString(36).replace(/[^a-z]+/g, '')
+
   useEffect(() => {
-    if(!socket){
+    if (countdownUntilStart === Constants.COUNTDOWN_FINAL_NUMBER)
+      return;
+
+    const countdownInterval = setInterval(() => {
+      if (countdownUntilStart === Constants.COUNTDOWN_FINAL_NUMBER) {
+        clearInterval(countdownInterval);
+
+        return;
+      }
+      setCountdownUntilStart(countdownUntilStart => countdownUntilStart - 1);
+    }, 1000);
+
+    return () => clearInterval(countdownInterval)
+  }, [countdownUntilStart])
+
+  useEffect(() => {
+    if (!socket) {
       return
     }
 
-    if(window.location.pathname === '/') {
+    if (window.location.pathname === '/') {
       const gameID = createPseudoRandomString()
       socket.emit('join game', gameID)
       history.replaceState(undefined, undefined, gameID) // eslint-disable-line no-restricted-globals
@@ -81,15 +100,15 @@ function App() {
   }, [socket])
 
   useEffect(() => {
-    if(process.env.NODE_ENV !== 'production') {
-      setSocket(io('http://localhost:3101'))
+    if (process.env.NODE_ENV !== 'production') {
+      setSocket(io(`http://localhost:3101`))
     } else {
       setSocket(io())
     }
   }, [])
 
   useEffect(() => {
-    if(!socket) {
+    if (!socket) {
       return
     }
 
@@ -98,15 +117,15 @@ function App() {
       setWrongChars(0)
       setOpponentCursorPositions({})
       setCursorPosition(0)
-
+      setCountdownUntilStart(Constants.COUNTDOWN_INITIAL_NUMBER);
       // It is crucial that the roundID is updated after the cursor is set to 0
       setRoundID(game.roundID)
     })
 
 
     socket.on('chat message', (content) => {
-      setMessages( messages => [...messages, 
-          content
+      setMessages(messages => [...messages,
+        content
       ])
     })
 
@@ -114,12 +133,12 @@ function App() {
       sid, // socket id, identifies the player/client
       position
     }) => {
-      setOpponentCursorPositions(opponentCursorPositions => ({...opponentCursorPositions, [sid]: position }))
+      setOpponentCursorPositions(opponentCursorPositions => ({ ...opponentCursorPositions, [sid]: position }))
     })
   }, [socket])
 
   useEffect(() => {
-    if(!socket || cursorPosition === undefined) {
+    if (!socket || cursorPosition === undefined) {
       return
     }
 
@@ -135,18 +154,19 @@ function App() {
       <p>To play liracer, open it on a laptop or desktop computer.</p>
     </div>
   ) : (
-    <Grid>
-      <ChatAndJoinButton messages={ messages }
-                         handleClickJoinGame={ handleClickJoinGame }
-                         handleSendMessage={handleSendMessage}/>
-      <CodeField snippet={ snippet }
-                 cursorPosition={cursorPosition}
-                 opponentCursorPositions={opponentCursorPositions}
-                 setCursorPosition={setCursorPosition}
-                 wrongChars={wrongChars}
-                 setWrongChars={setWrongChars} />
-    </Grid>
-  ) 
+      <Grid>
+        <ChatAndJoinButton messages={messages}
+          handleClickJoinGame={handleClickJoinGame}
+          handleSendMessage={handleSendMessage} />
+        <CodeField snippet={snippet}
+          cursorPosition={cursorPosition}
+          opponentCursorPositions={opponentCursorPositions}
+          setCursorPosition={setCursorPosition}
+          wrongChars={wrongChars}
+          countdownUntilStart={countdownUntilStart}
+          setWrongChars={setWrongChars} />
+      </Grid>
+    )
 }
 
 export default App
