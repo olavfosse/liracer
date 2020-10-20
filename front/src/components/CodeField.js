@@ -15,14 +15,14 @@ const Pre = styled.pre`
 `
 
 const mapKeyToChar = (key) => {
-  if(['Shift', 'Meta', 'Alt', 'Control', 'Backspace'].includes(key)){
-    return null
-  } else if (key === "Enter"){
+  if (key === "Enter"){
     return "\n"
   } else if (key === 'Tab') {
     return "\t"
-  } else {
+  } else if (key.length === 1) {
     return key
+  } else {
+    return null
   }
 }
 
