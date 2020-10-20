@@ -51,7 +51,7 @@ function App() {
   const handleSendMessage = event => {
     event.preventDefault()
 
-    socket.emit('chat message', event.target.input.value)
+    socket.emit('message', event.target.input.value)
     event.target.input.value = ''
   }
 
@@ -104,10 +104,12 @@ function App() {
     })
 
 
-    socket.on('chat message', (content) => {
-      setMessages( messages => [...messages, 
-          content
-      ])
+    socket.on('liracer message', (content) => {
+      setMessages(messages => [...messages, { sender: 'liracer', content }])
+    })
+
+    socket.on('anon message', ({playerID, content}) => {
+      setMessages(messages => [...messages, { sender: 'anon', content, playerID }])
     })
 
     socket.on('cursor position update', ({
