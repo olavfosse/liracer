@@ -2,6 +2,7 @@ import React from 'react'
 import Window from './Window'
 import styled from 'styled-components'
 import colors from '../colors'
+import constants from '../utils/constants';
 
 const contentPadding = '1rem'
 
@@ -14,8 +15,16 @@ const Pre = styled.pre`
   height: 100%;
 `
 
+const Countdown = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 12rem;
+`
+
 const mapKeyToChar = (key) => {
-  if (key === "Enter"){
+  if (key === "Enter") {
     return "\n"
   } else if (key === 'Tab') {
     return "\t"
@@ -31,22 +40,37 @@ const CodeField = (props) => {
     event.preventDefault()
 
     const char = mapKeyToChar(event.key)
-    if(char) {
-      if (props.wrongChars === 0 && props.snippet.code[props.cursorPosition] === char){
-        props.setCursorPosition(props.cursorPosition + 1)
+    if (props.countdownUntilStart !== constants.COUNTDOWN_FINAL_NUMBER) {
+      props.setWrongChars(wrongChars => wrongChars + 1)
+
+      return;
+    }
+
+    if (char) {
+      if (props.wrongChars === 0 && props.snippet.code[props.cursorPosition] === char) {
+        props.setCursorPosition(cursorPosition => cursorPosition + 1)
       } else {
-        props.setWrongChars(props.wrongChars + 1)
+        props.setWrongChars(wrongChars => wrongChars + 1)
       }
     } else {
-      if(event.key === 'Backspace') {
-        if(props.wrongChars > 0) {
-          props.setWrongChars(props.wrongChars - 1)
-        } else if(props.cursorPosition > 0) {
-          props.setCursorPosition(props.cursorPosition - 1)
+      if (event.key === 'Backspace') {
+        if (props.wrongChars > 0) {
+          props.setWrongChars(wrongChars => wrongChars - 1)
+        } else if (props.cursorPosition > 0) {
+          props.setCursorPosition(cursorPosition => cursorPosition - 1)
         }
       }
     }
   }
+
+  if (props.countdownUntilStart !== constants.COUNTDOWN_FINAL_NUMBER)
+    return (
+      <Window>
+        <Countdown onKeyDown={handleKeyDown} tabIndex='0'>
+          {props.countdownUntilStart}
+        </Countdown>
+      </Window>
+    )
 
   return (
     <Window>
@@ -65,14 +89,14 @@ const CodeField = (props) => {
                 isOnOpponentCursor && (style.background = colors.opponentCursorColor)
                 isOnPlayerCursor && (style.background = colors.playerCursorColor)
 
-                if(props.wrongChars > 0) {
-                  if(isOnWrongChar)
-                  style.background = colors.wrongCharColor
+                if (props.wrongChars > 0) {
+                  if (isOnWrongChar)
+                    style.background = colors.wrongCharColor
                 }
 
                 // Visualize newlines, by using the ↵ character
                 // Only show ↵ when the cursor, or wrongChars markings is on newline
-                if(char === "\n" && (isOnLastWrongChar || isOnOpponentCursor || (isOnPlayerCursor && !isOnWrongChar))) {
+                if (char === "\n" && (isOnLastWrongChar || isOnOpponentCursor || (isOnPlayerCursor && !isOnWrongChar))) {
                   char = "↵\n"
                 }
 
