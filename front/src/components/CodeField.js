@@ -20,6 +20,8 @@ const Countdown = styled.div`
   align-items: center;
   justify-content: center;
   height: 100%;
+  outline: none;
+  box-sizing: border-box;
   font-size: 12rem;
 `
 
