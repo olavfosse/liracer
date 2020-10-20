@@ -32,39 +32,24 @@ io.on('connection', socket => {
   let gameID
 
   const sendAnonLeftMessage = id => {
-    io.to(id).emit('chat message', {
-      sender: 'liracer',
-      content: 'anon left'
-    })
+    io.to(id).emit('liracer message', 'anon left')
   }
 
   const sendAnonJoinedMessage = id => {
-    io.to(id).emit('chat message', {
-      sender: 'liracer',
-      content: 'anon joined'
-    })
+    io.to(id).emit('liracer message', 'anon joined')
   }
 
   const sendGameCreatedMessage = id => {
-    io.to(id).emit('chat message', {
-      sender: 'liracer',
-      content: 'Game created'
-    })
+    io.to(id).emit('liracer message', 'Game created')
   }
 
   const sendCurrentSnippetMessage = id => {
-    io.to(id).emit('chat message', {
-      sender: 'liracer',
-      content: `The current snippet is ${games[id].snippet.name}`
-    })
+    io.to(id).emit('liracer message', `The current snippet is ${games[id].snippet.name}`)
   }
 
   const sendSnippetCompletedMessage = id => {
     const timeToComplete = (new Date().getTime() - games[id].startingTime) / 1000
-    io.to(id).emit('chat message', {
-      sender: 'liracer',
-      content : `${games[id].snippet.name} completed in ${timeToComplete} seconds`
-    })
+    io.to(id).emit('liracer message', `${games[id].snippet.name} completed in ${timeToComplete} seconds`)
   }
 
   const clearCursor = id => {
@@ -128,11 +113,10 @@ io.on('connection', socket => {
     }
   })
 
-  socket.on('chat message', (content) => { 
-    io.to(gameID).emit('chat message', {
-      sender: 'anon',
+  socket.on('message', (content) => {
+    io.to(gameID).emit('anon message', {
       content,
-      playerID: socket.id // Server send player ID that connect to the socket
+      playerID: socket.id
     })
   })
 })
