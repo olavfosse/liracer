@@ -13,6 +13,7 @@ const Pre = styled.pre`
   outline: none;
   box-sizing: border-box;
   height: 100%;
+  line-height; calc(100% + 3px); // Make space for the "underline"
 `
 
 const mapKeyToChar = (key) => {
@@ -28,7 +29,7 @@ const mapKeyToChar = (key) => {
 }
 
 const CodeField = (props) => {
-  const [isCodeFieldFocused, setCodeFieldFocused] = useState()
+  const [isFocused, setIsFocused] = useState(false)
 
   const handleKeyDown = (event) => {
     event.preventDefault()
@@ -51,15 +52,14 @@ const CodeField = (props) => {
     }
   }
 
-  const handleBlur = () => setCodeFieldFocused(false)
-
-  const handleFocus = () => setCodeFieldFocused(true)
-
   return (
     <Window>
       {
         props.snippet && (
-          <Pre onKeyDown={handleKeyDown} tabIndex='0' onBlur={handleBlur} onFocus={handleFocus}>
+          <Pre onKeyDown={handleKeyDown}
+               tabIndex='0'
+               onBlur={() => setIsFocused(false)}
+               onFocus={() => setIsFocused(true)}>
             {
               props.snippet.code.split('').map((char, index) => {
                 const isOnPlayerCursor = index === props.cursorPosition
@@ -67,19 +67,28 @@ const CodeField = (props) => {
                 const isOnLastWrongChar = props.wrongChars > 0 && index === props.cursorPosition + props.wrongChars - 1
                 const isOnWrongChar = index >= props.cursorPosition && index < props.cursorPosition + props.wrongChars
                 const isOnLastChar = isOnLastWrongChar || (!isOnWrongChar && isOnPlayerCursor)
-                const isOnPlayerCursorInactive = !isCodeFieldFocused && isOnLastChar
-                const isOnPlayerCursorActive = isCodeFieldFocused && isOnPlayerCursor
+                const isOnPlayerCursorActive = isFocused && isOnPlayerCursor
 
                 let style = {}
 
-                isOnOpponentCursor && (style.background = colors.opponentCursorColor)
-                isOnPlayerCursorInactive && (style.outline = 'inset 1px')
-                isOnPlayerCursorActive && (style.background = colors.playerCursorColor)
-                isOnLastChar && (style.borderBottomStyle = 'solid')
-
                 if(props.wrongChars > 0) {
-                  if(isOnWrongChar)
-                  style.background = colors.wrongCharColor
+                  if(isOnWrongChar) {
+                    if(isFocused) {
+                      style.background = colors.wrongCharColor
+                    } else {
+                      style.borderBottomStyle = 'solid'
+                      style.borderColor = colors.wrongCharColor
+                    }
+                  }
+                } else {
+                  if(isOnPlayerCursor) {
+                    if(isFocused) {
+                      style.background = colors.playerCursorColor
+                    } else {
+                      style.borderBottomStyle = 'solid'
+                      style.borderColor = colors.playerCursorColor
+                    }
+                  }
                 }
 
                 // Visualize newlines, by using the ↵ character
