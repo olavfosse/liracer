@@ -55,17 +55,29 @@ const MessagesDiv = styled.div`
 
 
 const Messages = (props) => {
-  const [isNavigationMode, setNavigationMode] = useState(false)
+  /*
+   * By default liracer automatically scrolls down when a new message is sent.
+   * By scrolling up, liracer enters navigation mode where you can scroll freely without automatic scrolling interfering.
+   * Navigation mode is exited by scrolling all the way down.
+   */
+  const [isInNavigationMode, setIsInNavigationMode] = useState(false)
   const messagesEndRef = useRef(null)
 
   useEffect(() => {
-    !isNavigationMode && messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
+    !isInNavigationMode && messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
   }, [props.messages])
 
-  const handleScroll = (scrollEvent) => {
-      const element = scrollEvent.currentTarget
-      const isBottom = Math.abs(element.scrollHeight - element.scrollTop - element.offsetHeight) < 3
-      setNavigationMode(!isBottom)
+  const handleScroll = (event) => {
+    const  {scrollHeight, scrollTop, offsetHeight} = event.target
+    const distanceToBottom =  Math.abs(scrollHeight - scrollTop - offsetHeight)
+    /*
+     * NB: Testing if `distanceToBottom === 0` is NOT sufficent to verify if the user scrolled all the way down
+     * It does not necesarrily evaluate to true on some systems(ubuntu+chromium for example) even though the user scrolled all the way down, such that it is impossible to scroll any longer.
+     * See https://github.com/olav35/liracer/pull/49#issuecomment-714450885
+     *
+     * Instead we test that it is within the range -3..3 which seems to work.
+     */
+    setIsInNavigationMode(!(distanceToBottom <= 3))
   }
 
   return (
