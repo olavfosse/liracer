@@ -55,7 +55,7 @@ const MessagesDiv = styled.div`
 
 
 const Messages = (props) => {
-  const [isNavigationMode, setNavigationMode] = useState()
+  const [isNavigationMode, setNavigationMode] = useState(false)
   const messagesEndRef = useRef(null)
 
   useEffect(() => {
