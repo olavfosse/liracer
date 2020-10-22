@@ -63,9 +63,9 @@ const Messages = (props) => {
   }, [props.messages])
 
   const handleScroll = (scrollEvent) => {
-      var element = scrollEvent.currentTarget
-      var isBottom = element.scrollTop + element.offsetHeight === element.scrollHeight
-      isBottom ? setNavigationMode(false) : setNavigationMode(true)
+      const element = scrollEvent.currentTarget
+      const isBottom = Math.abs(element.scrollHeight - element.scrollTop - element.offsetHeight) < 3
+      setNavigationMode(!isBottom)
   }
 
   return (
