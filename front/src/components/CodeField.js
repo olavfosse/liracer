@@ -57,13 +57,11 @@ const CodeField = (props) => {
       } else {
         props.setWrongChars(props.wrongChars + 1)
       }
-    } else {
-      if(event.key === 'Backspace') {
-        if(props.wrongChars > 0) {
-          props.setWrongChars(props.wrongChars - 1)
-        } else if(props.cursorPosition > 0) {
-          props.setCursorPosition(props.cursorPosition - 1)
-        }
+    } else if(event.key === 'Backspace') {
+      if(props.wrongChars > 0) {
+        props.setWrongChars(props.wrongChars - 1)
+      } else if(props.cursorPosition > 0) {
+        props.setCursorPosition(props.cursorPosition - 1)
       }
     }
   }
