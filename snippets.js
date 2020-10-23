@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 
 const mapCarriageReturnsToNewlines = (s) => {
-  return s.split('').map(c => c.charCodeAt(0) === 13 || c.charCodeAt(0) === 10 ? '\n' : c).join('')
+  return s.split('').map(c => c === '\r' ? '\n' : c).join('')
 }
 
 const getSnippets = () => {
