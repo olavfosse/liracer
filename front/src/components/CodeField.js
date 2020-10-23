@@ -67,7 +67,6 @@ const CodeField = (props) => {
                 const isOnLastWrongChar = props.wrongChars > 0 && index === props.cursorPosition + props.wrongChars - 1
                 const isOnWrongChar = index >= props.cursorPosition && index < props.cursorPosition + props.wrongChars
                 const isOnLastChar = isOnLastWrongChar || (!isOnWrongChar && isOnPlayerCursor)
-                const isOnPlayerCursorActive = isFocused && isOnPlayerCursor
 
                 let style = {}
 
