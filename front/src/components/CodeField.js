@@ -32,7 +32,23 @@ const CodeField = (props) => {
   const [isFocused, setIsFocused] = useState(false)
 
   const handleKeyDown = (event) => {
-    event.preventDefault()
+    // For each key, specify a problem that happens if it is not eventPreventDefaulted and one or more environments (browser and os) it occurs in
+    const keysToEventPreventDefault = [
+      /*
+       * problem: Switches focus
+       * environment: Chrome/MacOS
+       * environment: Safari/MacOS
+       */
+      'Tab',
+      /*
+       * problem: Navigates history
+       * environment: Firefox/MacOS
+       */
+      'Backspace'
+    ]
+    if(keysToEventPreventDefault.includes(event.key)) {
+      event.preventDefault()
+    }
 
     const char = mapKeyToChar(event.key)
     if(char) {
