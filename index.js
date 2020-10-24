@@ -30,6 +30,7 @@ const createGame = _ => ({
 
 io.on('connection', socket => {
   let gameID
+  let playerNickname = 'anon'
 
   const sendAnonLeftMessage = id => {
     io.to(id).emit('liracer message', 'anon left')
@@ -115,9 +116,14 @@ io.on('connection', socket => {
 
   socket.on('message', (content) => {
     io.to(gameID).emit('anon message', {
+      sender: playerNickname,
       content,
       playerID: socket.id
     })
+    if (content.includes("/nick")) {
+      playerNickname = content.substring(5).trim()
+      io.to(gameID).emit('liracer message', "Your nickname has been set to " + playerNickname)
+    }
   })
 })
 

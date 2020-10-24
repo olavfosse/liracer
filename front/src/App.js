@@ -108,8 +108,8 @@ function App() {
       setMessages(messages => [...messages, { sender: 'liracer', content }])
     })
 
-    socket.on('anon message', ({playerID, content}) => {
-      setMessages(messages => [...messages, { sender: 'anon', content, playerID }])
+    socket.on('anon message', ({sender, playerID, content}) => {
+      setMessages(messages => [...messages, { sender, content, playerID }])
     })
 
     socket.on('cursor position update', ({
