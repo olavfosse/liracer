@@ -112,6 +112,10 @@ function App() {
       setMessages(messages => [...messages, { sender, content, playerID }])
     })
 
+    socket.on('set nickname', (nickname) => {
+      document.cookie = "nickname=" + nickname
+    })
+
     socket.on('cursor position update', ({
       sid, // socket id, identifies the player/client
       position
