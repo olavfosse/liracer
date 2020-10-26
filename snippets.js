@@ -1,6 +1,10 @@
 const fs = require('fs')
 const path = require('path')
 
+const mapCarriageReturnsToNewlines = (s) => {
+  return s.split('').map(c => c === '\r' ? '\n' : c).join('')
+}
+
 const getSnippets = () => {
   const snippets = []
   const rootPath = path.join(__dirname, 'snippets')
@@ -13,8 +17,10 @@ const getSnippets = () => {
     programPaths.forEach(program => {
       const programPath = path.join(programsPath, program)
       const options = { encoding: 'utf8', flag:'r' }
-      const code = fs.readFileSync(programPath, options)
-
+      let code = fs.readFileSync(programPath, options)
+      // This might fix #50
+      // Currently this is not tested on windows, where the problem occured because I(fossegrim) don't have a windows box at hand
+      code = mapCarriageReturnsToNewlines(code)
       const snippet = {
         language,
         code,
