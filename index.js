@@ -127,12 +127,15 @@ io.on('connection', socket => {
         })
         const tempPlayerNickname = content.substring(5).trim()
         const regex = new RegExp("^([a-zA-Z0-9_]{1,15})$")
-        if (regex.test(tempPlayerNickname)) {
+        if (tempPlayerNickname === 'liracer') {
+          io.to(socket.id).emit('liracer message', "You are not allow to use this nickname")
+        }
+        else if (regex.test(tempPlayerNickname)) {
           playerNickname = tempPlayerNickname
           io.to(socket.id).emit('liracer message', "Your nickname has been set to " + playerNickname) //Emit liracer message to the player use /nick command
-          io.to(gameID).emit('set nickname', playerNickname)
+          io.to(socket.id).emit('set nickname', playerNickname)
         } else {
-          io.to(gameID).emit('liracer message', 'Nickname must be between 1-15 characters long and cannot contains special characters')
+          io.to(socket.id).emit('liracer message', 'Nickname must be between 1-15 characters long and cannot contains special characters')
         }
         break
       default:
