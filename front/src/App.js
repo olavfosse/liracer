@@ -5,7 +5,6 @@ import io from 'socket.io-client'
 import isMobile from 'ismobilejs'
 import ChatAndJoinButton from './components/ChatAndJoinButton'
 import CodeField from './components/CodeField'
-import Constants from './utils/constants';
 import colors from './colors'
 const Grid = styled.div`
 // Consume the entire viewport
@@ -40,7 +39,7 @@ function App() {
   const [wrongChars, setWrongChars] = useState()
   const [messages, setMessages] = useState([]) // message content, sender name and optionally playerID
   const [socket, setSocket] = useState()
-  const [countdownUntilStart, setCountdownUntilStart] = useState(-1)
+  const [hasGameBegun, setHasGameBegun] = useState()
 
   const handleClickJoinGame = _ => {
     const gameID = prompt('GameID')
@@ -66,22 +65,6 @@ function App() {
   }
 
   const createPseudoRandomString = _ => Math.random().toString(36).replace(/[^a-z]+/g, '')
-
-  useEffect(() => {
-    if (countdownUntilStart === Constants.COUNTDOWN_FINAL_NUMBER)
-      return;
-
-    const countdownInterval = setInterval(() => {
-      if (countdownUntilStart === Constants.COUNTDOWN_FINAL_NUMBER) {
-        clearInterval(countdownInterval);
-
-        return;
-      }
-      setCountdownUntilStart(countdownUntilStart => countdownUntilStart - 1);
-    }, 1000);
-
-    return () => clearInterval(countdownInterval)
-  }, [countdownUntilStart])
 
   useEffect(() => {
     if (!socket) {
@@ -117,13 +100,17 @@ function App() {
       setWrongChars(0)
       setOpponentCursorPositions({})
       setCursorPosition(0)
-      setCountdownUntilStart(Constants.COUNTDOWN_INITIAL_NUMBER);
+      setHasGameBegun(false)
       // It is crucial that the roundID is updated after the cursor is set to 0
       setRoundID(game.roundID)
     })
-    
+
     socket.on('liracer message', (content) => {
       setMessages(messages => [...messages, { sender: 'liracer', content }])
+    })
+
+    socket.on('begin game', (shouldStartGame) => {
+      setHasGameBegun(shouldStartGame)
     })
 
     socket.on('anon message', ({playerID, content}) => {
@@ -164,7 +151,7 @@ function App() {
           opponentCursorPositions={opponentCursorPositions}
           setCursorPosition={setCursorPosition}
           wrongChars={wrongChars}
-          countdownUntilStart={countdownUntilStart}
+          hasGameBegun={hasGameBegun}
           setWrongChars={setWrongChars} />
       </Grid>
     )

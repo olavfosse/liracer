@@ -1,3 +1,4 @@
+const { COUNTDOWN_FINAL_NUMBER, COUNTDOWN_INITIAL_NUMBER, WAIT_TIME_UNTIL_GAME_BEGIN_MILLISECONDS } = require('./utils/constants')
 const { clear } = require('console')
 const express = require('express')
 const app = express()
@@ -17,9 +18,12 @@ app.get('/*', (_request, response) => {
 })
 
 const snippets = require('./snippets.js')
+const { setInterval } = require('timers')
 const randomSnippet = () => snippets[Math.floor(snippets.length * Math.random())]
 
 const games = {}
+let countdownInterval;
+let countdownTimeLeft;
 
 const createPseudoRandomString = _ => Math.random().toString(36).replace(/[^a-z]+/g, '')
 const createGame = _ => ({
@@ -41,6 +45,11 @@ io.on('connection', socket => {
 
   const sendGameCreatedMessage = id => {
     io.to(id).emit('liracer message', 'Game created')
+    io.to(id).emit('liracer message', `Be prepared! The game will begin in ${WAIT_TIME_UNTIL_GAME_BEGIN_MILLISECONDS / 1000} seconds`)
+    setTimeout(() => {
+      countdownTimeLeft = COUNTDOWN_INITIAL_NUMBER;
+      countdownInterval = setInterval(countdownAction, 1000)
+    }, WAIT_TIME_UNTIL_GAME_BEGIN_MILLISECONDS)
   }
 
   const sendCurrentSnippetMessage = id => {
@@ -50,6 +59,22 @@ io.on('connection', socket => {
   const sendSnippetCompletedMessage = id => {
     const timeToComplete = (new Date().getTime() - games[id].startingTime) / 1000
     io.to(id).emit('liracer message', `${games[id].snippet.name} completed in ${timeToComplete} seconds`)
+    sendBeginGame(id, false)
+  }
+
+  const sendCountdownMessage = (id, timeLeftForBeginning) => {
+    if (timeLeftForBeginning === COUNTDOWN_FINAL_NUMBER + 1) {
+      io.to(id).emit('liracer message', `Ready?`)
+
+      return;
+    }
+
+    io.to(id).emit('liracer message', `Game will begin in ${timeLeftForBeginning} seconds!`)
+  }
+
+  const sendBeginGame = (id, shouldStartGame) => {
+    io.to(id).emit('begin game', shouldStartGame)
+    io.to(id).emit('liracer message', `Start!`)
   }
 
   const clearCursor = id => {
@@ -119,6 +144,18 @@ io.on('connection', socket => {
       playerID: socket.id
     })
   })
+
+  const countdownAction = () => {
+    if (countdownTimeLeft <= COUNTDOWN_FINAL_NUMBER) {
+      clearInterval(countdownInterval)
+      sendBeginGame(gameID, true)
+
+      return;
+    }
+
+    sendCountdownMessage(gameID, countdownTimeLeft)
+    countdownTimeLeft--
+  }
 })
 
 console.log(`listening on ${port}`)

@@ -3,7 +3,6 @@ import { useState } from 'react'
 import Window from './Window'
 import styled from 'styled-components'
 import colors from '../colors'
-import constants from '../utils/constants';
 
 const contentPadding = '1rem'
 
@@ -52,7 +51,7 @@ const CodeField = (props) => {
     }
 
     const char = mapKeyToChar(event.key)
-    if (props.countdownUntilStart !== constants.COUNTDOWN_FINAL_NUMBER) {
+    if (! props.hasGameBegun) {
       props.setWrongChars(wrongChars => wrongChars + 1)
 
       return;
@@ -72,15 +71,6 @@ const CodeField = (props) => {
       }
     }
   }
-
-  if (props.countdownUntilStart !== constants.COUNTDOWN_FINAL_NUMBER)
-    return (
-      <Window>
-        <Countdown onKeyDown={handleKeyDown} tabIndex='0'>
-          {props.countdownUntilStart}
-        </Countdown>
-      </Window>
-    )
 
   return (
     <Window>
