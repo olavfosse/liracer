@@ -108,7 +108,7 @@ function App() {
       setMessages(messages => [...messages, { sender: 'liracer', content }])
     })
 
-    socket.on('anon message', ({sender, playerID, content}) => {
+    socket.on('user message', ({sender, playerID, content}) => {
       setMessages(messages => [...messages, { sender, content, playerID }])
     })
 

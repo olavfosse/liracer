@@ -34,12 +34,12 @@ io.on('connection', socket => {
   let gameID
   let playerNickname = cookies.nickname || 'anon'
 
-  const sendAnonLeftMessage = id => {
-    io.to(id).emit('liracer message', 'anon left')
+  const sendUserLeftMessage = id => {
+    io.to(id).emit('liracer message', `${playerNickname} left`)
   }
 
-  const sendAnonJoinedMessage = id => {
-    io.to(id).emit('liracer message', 'anon joined')
+  const sendUserJoinedMessage = id => {
+    io.to(id).emit('liracer message', `${playerNickname} joined`)
   }
 
   const sendGameCreatedMessage = id => {
@@ -66,16 +66,16 @@ io.on('connection', socket => {
 
   socket.on('disconnecting', () => {
     clearCursor(gameID)
-    sendAnonLeftMessage(gameID)
+    sendUserLeftMessage(gameID)
   })
 
   socket.on('join game', id => {
     socket.leave(gameID)
-    sendAnonLeftMessage(gameID)
+    sendUserLeftMessage(gameID)
 
     socket.join(id)
     if(games[id]) {
-      sendAnonJoinedMessage(id)
+      sendUserJoinedMessage(id)
     } else {
       sendGameCreatedMessage(id)
       games[id] = createGame()
@@ -120,7 +120,7 @@ io.on('connection', socket => {
     const command = content.split(' ')[0]
     switch (command) {
       case ('/nick'):
-        io.to(socket.id).emit('anon message', {
+        io.to(socket.id).emit('user message', {
           sender: playerNickname,
           content,
           playerID: socket.id
@@ -139,7 +139,7 @@ io.on('connection', socket => {
         }
         break
       default:
-        io.to(gameID).emit('anon message', {
+        io.to(gameID).emit('user message', {
           sender: playerNickname,
           content,
           playerID: socket.id
