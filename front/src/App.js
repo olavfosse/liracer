@@ -89,18 +89,19 @@ function App() {
       socket.emit('join game', gameID)
       history.pushState(undefined, undefined, gameID) // eslint-disable-line no-restricted-globals
     }
-
-    const nickname = localStorage.getItem('nickname')
-    if(nickname) {
-      socket.emit('set nickname', nickname)
-    }
   }, [socket])
 
   useEffect(() => {
+    const options = {
+      query: {
+	nickname: localStorage.getItem('nickname') || 'anon'
+      }
+    }
+
     if(process.env.NODE_ENV !== 'production') {
-      setSocket(io('http://localhost:3101'))
+      setSocket(io('http://localhost:3101', options))
     } else {
-      setSocket(io())
+      setSocket(io(undefined, ...options))
     }
   }, [])
 

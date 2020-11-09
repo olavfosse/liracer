@@ -31,7 +31,8 @@ const createGame = _ => ({
 
 io.on('connection', socket => {
   let gameID
-  let nickname = 'anon'
+  const nicknameValidation = validateNickname(socket.handshake.query.nickname)
+  let nickname = nicknameValidation.valid ? socket.handshake.query.nickname : 'anon'
 
   const sendUserLeftMessage = id => {
     io.to(id).emit('liracer message', `${nickname} left`)
