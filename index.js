@@ -6,7 +6,6 @@ const options = {
   serveClient: false
 }
 const io = require('socket.io')(server, options)
-const cookie = require('cookie')
 
 // The frontend assumes that the backend is on same port as backend in production and on port 3101 otherwise
 const port = process.env.PORT || 3101
@@ -30,9 +29,8 @@ const createGame = _ => ({
 })
 
 io.on('connection', socket => {
-  const cookies = cookie.parse(socket.request.headers.cookie || '')
   let gameID
-  let nickname = cookies.nickname || 'anon'
+  let nickname = 'anon'
 
   const sendUserLeftMessage = id => {
     io.to(id).emit('liracer message', `${nickname} left`)
@@ -134,7 +132,6 @@ io.on('connection', socket => {
         socket.emit('liracer message', 'Nickname must be between 1-15 characters long and cannot contains special characters')
       } else {
 	nickname = nick
-	socket.emit('set nickname', nickname)
         socket.emit('liracer message', `Your nickname has been set to ${nickname}`)
       }
       break

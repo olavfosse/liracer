@@ -103,7 +103,6 @@ function App() {
       setRoundID(game.roundID)
     })
 
-
     socket.on('liracer message', (content) => {
       setMessages(messages => [...messages, { sender: 'liracer', content }])
     })
@@ -112,11 +111,7 @@ function App() {
       setMessages(messages => [...messages, { sender, content, playerID }])
     })
 
-    socket.on('set nickname', (nickname) => {
-      document.cookie = "nickname=" + nickname
-    })
-
-    socket.on('cursor position update', ({
+     socket.on('cursor position update', ({
       sid, // socket id, identifies the player/client
       position
     }) => {
