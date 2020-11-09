@@ -6,6 +6,7 @@ const options = {
   serveClient: false
 }
 const io = require('socket.io')(server, options)
+const { validateNickname} = require('./validators')
 
 // The frontend assumes that the backend is on same port as backend in production and on port 3101 otherwise
 const port = process.env.PORT || 3101
@@ -30,13 +31,15 @@ const createGame = _ => ({
 
 io.on('connection', socket => {
   let gameID
+  const nicknameValidation = validateNickname(socket.handshake.query.nickname)
+  let nickname = nicknameValidation.valid ? socket.handshake.query.nickname : 'anon'
 
-  const sendAnonLeftMessage = id => {
-    io.to(id).emit('liracer message', 'anon left')
+  const sendUserLeftMessage = id => {
+    io.to(id).emit('liracer message', `${nickname} left`)
   }
 
-  const sendAnonJoinedMessage = id => {
-    io.to(id).emit('liracer message', 'anon joined')
+  const sendUserJoinedMessage = id => {
+    io.to(id).emit('liracer message', `${nickname} joined`)
   }
 
   const sendGameCreatedMessage = id => {
@@ -63,16 +66,16 @@ io.on('connection', socket => {
 
   socket.on('disconnecting', () => {
     clearCursor(gameID)
-    sendAnonLeftMessage(gameID)
+    sendUserLeftMessage(gameID)
   })
 
   socket.on('join game', id => {
     socket.leave(gameID)
-    sendAnonLeftMessage(gameID)
+    sendUserLeftMessage(gameID)
 
     socket.join(id)
     if(games[id]) {
-      sendAnonJoinedMessage(id)
+      sendUserJoinedMessage(id)
     } else {
       sendGameCreatedMessage(id)
       games[id] = createGame()
@@ -114,10 +117,22 @@ io.on('connection', socket => {
   })
 
   socket.on('message', (content) => {
-    io.to(gameID).emit('anon message', {
+    io.to(gameID).emit('user message', {
+      sender: nickname,
       content,
       playerID: socket.id
     })
+  })
+
+  socket.on('set nickname', (nick) => {
+    const {valid, problem} = validateNickname(nick)
+    if(valid) {
+      nickname = nick
+      socket.emit('liracer message', `Your nickname has been set to ${nickname}`)
+      socket.emit('set nickname', nickname)
+    } else {
+      socket.emit('liracer message', problem)
+    }
   })
 })
 

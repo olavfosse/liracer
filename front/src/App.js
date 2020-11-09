@@ -51,8 +51,19 @@ function App() {
   const handleSendMessage = event => {
     event.preventDefault()
 
-    socket.emit('message', event.target.input.value)
+    const content = event.target.input.value
     event.target.input.value = ''
+
+    const [command, ...args] = content.split(' ').filter(word => word !== '')
+    switch (command) {
+    case ('/nick'):
+      const nickname = args[0]
+      socket.emit('set nickname', nickname)
+      break
+    default:
+      socket.emit('message', content)     
+      break
+    }
   }
 
   const parseGameIDFromLocation = location => decodeURI(location.pathname).slice(1)
@@ -81,10 +92,16 @@ function App() {
   }, [socket])
 
   useEffect(() => {
+    const options = {
+      query: {
+	nickname: localStorage.getItem('nickname') || 'anon'
+      }
+    }
+
     if(process.env.NODE_ENV !== 'production') {
-      setSocket(io('http://localhost:3101'))
+      setSocket(io('http://localhost:3101', options))
     } else {
-      setSocket(io())
+      setSocket(io(undefined, ...options))
     }
   }, [])
 
@@ -103,13 +120,16 @@ function App() {
       setRoundID(game.roundID)
     })
 
-
     socket.on('liracer message', (content) => {
       setMessages(messages => [...messages, { sender: 'liracer', content }])
     })
 
-    socket.on('anon message', ({playerID, content}) => {
-      setMessages(messages => [...messages, { sender: 'anon', content, playerID }])
+    socket.on('user message', ({sender, playerID, content}) => {
+      setMessages(messages => [...messages, { sender, content, playerID }])
+    })
+    
+    socket.on('set nickname', (nickname) => {
+      localStorage.setItem('nickname', nickname)
     })
 
     socket.on('cursor position update', ({
@@ -139,14 +159,14 @@ function App() {
   ) : (
     <Grid>
       <ChatAndJoinButton messages={ messages }
-                         handleClickJoinGame={ handleClickJoinGame }
-                         handleSendMessage={handleSendMessage}/>
+			 handleClickJoinGame={ handleClickJoinGame }
+			 handleSendMessage={handleSendMessage}/>
       <CodeField snippet={ snippet }
-                 cursorPosition={cursorPosition}
-                 opponentCursorPositions={opponentCursorPositions}
-                 setCursorPosition={setCursorPosition}
-                 wrongChars={wrongChars}
-                 setWrongChars={setWrongChars} />
+		 cursorPosition={cursorPosition}
+		 opponentCursorPositions={opponentCursorPositions}
+		 setCursorPosition={setCursorPosition}
+		 wrongChars={wrongChars}
+		 setWrongChars={setWrongChars} />
     </Grid>
   ) 
 }
