@@ -32,14 +32,14 @@ const createGame = _ => ({
 io.on('connection', socket => {
   const cookies = cookie.parse(socket.request.headers.cookie || '')
   let gameID
-  let playerNickname = cookies.nickname || 'anon'
+  let nickname = cookies.nickname || 'anon'
 
   const sendUserLeftMessage = id => {
-    io.to(id).emit('liracer message', `${playerNickname} left`)
+    io.to(id).emit('liracer message', `${nickname} left`)
   }
 
   const sendUserJoinedMessage = id => {
-    io.to(id).emit('liracer message', `${playerNickname} joined`)
+    io.to(id).emit('liracer message', `${nickname} joined`)
   }
 
   const sendGameCreatedMessage = id => {
@@ -117,34 +117,34 @@ io.on('connection', socket => {
   })
 
   socket.on('message', (content) => {
-    const command = content.split(' ')[0]
+    const [command, ...arguments] = content.split(' ').filter(word => word != '')
     switch (command) {
-      case ('/nick'):
-        io.to(socket.id).emit('user message', {
-          sender: playerNickname,
-          content,
-          playerID: socket.id
-        })
-        const tempPlayerNickname = content.substring(5).trim()
-        const regex = new RegExp("^([a-zA-Z0-9_]{1,15})$")
-        if (tempPlayerNickname === 'liracer') {
-          io.to(socket.id).emit('liracer message', "You are not allow to use this nickname")
-        }
-        else if (regex.test(tempPlayerNickname)) {
-          playerNickname = tempPlayerNickname
-          io.to(socket.id).emit('liracer message', "Your nickname has been set to " + playerNickname) //Emit liracer message to the player use /nick command
-          io.to(socket.id).emit('set nickname', playerNickname)
-        } else {
-          io.to(socket.id).emit('liracer message', 'Nickname must be between 1-15 characters long and cannot contains special characters')
-        }
-        break
-      default:
-        io.to(gameID).emit('user message', {
-          sender: playerNickname,
-          content,
-          playerID: socket.id
-        })
-        break;
+    case ('/nick'):
+      socket.emit('user message', {
+        sender: nickname,
+        content,
+        playerID: socket.id
+      })
+      const nick = arguments[0]
+      if(nick === undefined) {
+	socket.emit('liracer message', 'usage:  /nick nickname')
+      } else if (nick === 'liracer') {
+        socket.emit('liracer message', "You are not allowed to use this nickname")
+      } else if (!/^([a-zA-Z0-9_]{1,15})$/.test(nick)) {
+        socket.emit('liracer message', 'Nickname must be between 1-15 characters long and cannot contains special characters')
+      } else {
+	nickname = nick
+	socket.emit('set nickname', nickname)
+        socket.emit('liracer message', `Your nickname has been set to ${nickname}`)
+      }
+      break
+    default:
+      io.to(gameID).emit('user message', {
+        sender: nickname,
+        content,
+        playerID: socket.id
+      })
+      break;
     }
   })
 })
