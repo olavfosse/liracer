@@ -6,6 +6,7 @@ const options = {
   serveClient: false
 }
 const io = require('socket.io')(server, options)
+const { validateNickname} = require('./validators')
 
 // The frontend assumes that the backend is on same port as backend in production and on port 3101 otherwise
 const port = process.env.PORT || 3101
@@ -115,33 +116,21 @@ io.on('connection', socket => {
   })
 
   socket.on('message', (content) => {
-    const [command, ...arguments] = content.split(' ').filter(word => word != '')
-    switch (command) {
-    case ('/nick'):
-      socket.emit('user message', {
-        sender: nickname,
-        content,
-        playerID: socket.id
-      })
-      const nick = arguments[0]
-      if(nick === undefined) {
-	socket.emit('liracer message', 'usage:  /nick nickname')
-      } else if (nick === 'liracer') {
-        socket.emit('liracer message', "You are not allowed to use this nickname")
-      } else if (!/^([a-zA-Z0-9_]{1,15})$/.test(nick)) {
-        socket.emit('liracer message', 'Nickname must be between 1-15 characters long and cannot contains special characters')
-      } else {
-	nickname = nick
-        socket.emit('liracer message', `Your nickname has been set to ${nickname}`)
-      }
-      break
-    default:
-      io.to(gameID).emit('user message', {
-        sender: nickname,
-        content,
-        playerID: socket.id
-      })
-      break;
+    io.to(gameID).emit('user message', {
+      sender: nickname,
+      content,
+      playerID: socket.id
+    })
+  })
+
+  socket.on('set nickname', (nick) => {
+    const {valid, problem} = validateNickname(nick)
+    if(valid) {
+      nickname = nick
+      socket.emit('liracer message', `Your nickname has been set to ${nickname}`)
+      socket.emit('set nickname', nickname)
+    } else {
+      socket.emit('liracer message', problem)
     }
   })
 })

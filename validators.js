@@ -1,4 +1,4 @@
-export const validateNickname = (nickname) => {
+validateNickname = (nickname) => {
   if(typeof nickname !== 'string') {
     return {
       valid: false,
@@ -14,19 +14,23 @@ export const validateNickname = (nickname) => {
       valid: false,
       problem: 'nickname must be at most fifteen characters'
     }
-  } else if (nick.split('').some(c => !/^([a-zA-Z0-9_]{1,15})$/.test(c))) {
+  } else if (nickname.split('').some(c => !/^([a-zA-Z0-9_]{1,15})$/.test(c))) {
     return {
       valid: false,
-      problem: 'nickname must not contain special characters'
+      problem: 'nickname cannot contain special characters'
     }
-  } else if (nick === 'liracer') {
+  } else if (nickname === 'liracer') {
     return {
       valid: false,
-      problem: 'nickname must not be "liracer"'
+      problem: 'nickname cannot be "liracer"'
     }
   } else {
     return {
       valid: true
     }
   }
+}
+
+module.exports = {
+  validateNickname
 }

@@ -51,8 +51,19 @@ function App() {
   const handleSendMessage = event => {
     event.preventDefault()
 
-    socket.emit('message', event.target.input.value)
+    const content = event.target.input.value
     event.target.input.value = ''
+
+    const [command, ...args] = content.split(' ').filter(word => word !== '')
+    switch (command) {
+    case ('/nick'):
+      const nickname = args[0]
+      socket.emit('set nickname', nickname)
+      break
+    default:
+      socket.emit('message', content)     
+      break
+    }
   }
 
   const parseGameIDFromLocation = location => decodeURI(location.pathname).slice(1)
@@ -77,6 +88,11 @@ function App() {
       const gameID = parseGameIDFromLocation(window.location)
       socket.emit('join game', gameID)
       history.pushState(undefined, undefined, gameID) // eslint-disable-line no-restricted-globals
+    }
+
+    const nickname = localStorage.getItem('nickname')
+    if(nickname) {
+      socket.emit('set nickname', nickname)
     }
   }, [socket])
 
@@ -110,8 +126,12 @@ function App() {
     socket.on('user message', ({sender, playerID, content}) => {
       setMessages(messages => [...messages, { sender, content, playerID }])
     })
+    
+    socket.on('set nickname', (nickname) => {
+      localStorage.setItem('nickname', nickname)
+    })
 
-     socket.on('cursor position update', ({
+    socket.on('cursor position update', ({
       sid, // socket id, identifies the player/client
       position
     }) => {
@@ -138,14 +158,14 @@ function App() {
   ) : (
     <Grid>
       <ChatAndJoinButton messages={ messages }
-                         handleClickJoinGame={ handleClickJoinGame }
-                         handleSendMessage={handleSendMessage}/>
+			 handleClickJoinGame={ handleClickJoinGame }
+			 handleSendMessage={handleSendMessage}/>
       <CodeField snippet={ snippet }
-                 cursorPosition={cursorPosition}
-                 opponentCursorPositions={opponentCursorPositions}
-                 setCursorPosition={setCursorPosition}
-                 wrongChars={wrongChars}
-                 setWrongChars={setWrongChars} />
+		 cursorPosition={cursorPosition}
+		 opponentCursorPositions={opponentCursorPositions}
+		 setCursorPosition={setCursorPosition}
+		 wrongChars={wrongChars}
+		 setWrongChars={setWrongChars} />
     </Grid>
   ) 
 }
