@@ -1,0 +1,10 @@
+body {
+    /* lengths */
+    --toolbar-height: 30px;
+    --window-gap: 32px;
+
+    /* colors */
+    --layer-0-background:    #fdf6e3;
+    --layer-1-background:    #eee8d5;
+    --layer-2-background:    #ded8c5;
+}

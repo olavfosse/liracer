@@ -1,0 +1,29 @@
+body { margin: 0; }
+main {
+    background: var(--layer-0-background);
+    box-sizing: border-box;
+    padding: var(--window-gap);
+    column-gap: var(--window-gap);
+    height: 100vh;
+    width: 100vw;
+    display: grid;
+    grid-template-columns: minmax(300px, 500px) minmax(750px, auto);
+    grid-template-areas: "chat codefield";
+
+    /* TODO: if the viewport is too narrow, dedicate all of it too the
+       chat and output a message informing the user that they must
+       expand it to view the code.*/
+    overflow: hidden;
+}
+
+#chat, #codefield {
+    background: var(--layer-1-background);
+
+    box-sizing: border-box;
+    padding: 16px;
+    border-top-color: var(--layer-2-background);
+    border-top-style: solid;
+    border-top-width: 30px;
+}
+#chat { grid-area: chat; }
+#codefield { grid-area: codefield; }
