@@ -26,4 +26,8 @@ main {
     border-top-width: 30px;
 }
 #chat { grid-area: chat; }
-#codefield { grid-area: codefield; }
+#codefield {
+    margin: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+}
