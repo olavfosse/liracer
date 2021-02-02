@@ -3,22 +3,19 @@ main {
     background: var(--layer-0-background);
     box-sizing: border-box;
     padding: var(--window-gap);
-    column-gap: var(--window-gap);
-    row-gap: var(--window-gap);
+    gap: var(--window-gap);
     height: 100vh;
     width: 100vw;
     display: grid;
     grid-template-columns: minmax(300px, 500px) minmax(750px, auto);
-    grid-template-rows: 200px auto;
-    grid-template-areas: "chat statistics"
-			 "chat codefield";
+    grid-template-areas: "chat codefield";
 
     /* TODO: if the viewport is too narrow, dedicate all of it too the
        chat and output a message informing the user that they must
        expand it to view the code.*/
 }
 
-.chat, .codefield, .statistics {
+.chat, .codefield {
     background: var(--layer-1-background);
 
     box-sizing: border-box;
@@ -70,8 +67,4 @@ main {
 }
 .codefield-character-player.codefield-character-newline {
     color: var(--layer-2-foreground);
-}
-
-.statistics {
-    grid-area: statistics;
 }
