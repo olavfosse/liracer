@@ -4,7 +4,10 @@ body {
     --window-gap: 32px;
 
     /* colors */
-    --layer-0-background:    #fdf6e3;
-    --layer-1-background:    #eee8d5;
-    --layer-2-background:    #ded8c5;
+    --layer-0-background:         #fdf6e3;
+    --layer-1-background:         #eee8d5;
+    --layer-2-background:         #ded8c5;
+    --layer-2-foreground:         #4D444A;
+    --cursor-player-background:   #cebaa6;
+    --cursor-opponent-background: blue; /* placeholder color */
 }

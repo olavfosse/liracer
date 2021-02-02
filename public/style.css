@@ -4,19 +4,21 @@ main {
     box-sizing: border-box;
     padding: var(--window-gap);
     column-gap: var(--window-gap);
+    row-gap: var(--window-gap);
     height: 100vh;
     width: 100vw;
     display: grid;
     grid-template-columns: minmax(300px, 500px) minmax(750px, auto);
-    grid-template-areas: "chat codefield";
+    grid-template-rows: 200px auto;
+    grid-template-areas: "chat statistics"
+			 "chat codefield";
 
     /* TODO: if the viewport is too narrow, dedicate all of it too the
        chat and output a message informing the user that they must
        expand it to view the code.*/
-    overflow: hidden;
 }
 
-#chat, #codefield {
+.chat, .codefield, .statistics {
     background: var(--layer-1-background);
 
     box-sizing: border-box;
@@ -25,9 +27,51 @@ main {
     border-top-style: solid;
     border-top-width: 30px;
 }
-#chat { grid-area: chat; }
-#codefield {
+.chat { grid-area: chat; }
+.codefield {
     margin: 0;
     font-family: 'JetBrains Mono', monospace;
     font-size: 14px;
+    grid-area: codefield;
+}
+
+/* Jeg tenker det er best å farge bokstavene i javascript. kanjse, kanskje ikke. */
+/* Codefield */
+/* .codefield-character { */
+/*     color: var(--cursor-color); */
+/* } */
+
+.codefield-character {
+    color: var(--layer-2-foreground);
+}
+
+/* Newlines are an edgecase. Displaying them all the time looks ugly,
+   but not displaying them if a cursor is on them or they are
+   (mis)spelled is confusing. Therefore we only display them if a
+   cursor is on them or if they have been (mis)spelled.  */
+.codefield-character-newline {
+    color: var(--layer-1-background);
+}
+
+.codefield-character-correct {
+    color: green;
+}
+
+.codefield-character-incorrect {
+    color: red;
+}
+
+.codefield-character-opponent {
+    background: var(--cursor-opponent-background);
+}
+
+.codefield-character-player {
+    background: var(--cursor-player-background);
+}
+.codefield-character-player.codefield-character-newline {
+    color: var(--layer-2-foreground);
+}
+
+.statistics {
+    grid-area: statistics;
 }
