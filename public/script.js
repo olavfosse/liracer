@@ -1,6 +1,6 @@
-/*
- * CONSTANTS
- */
+/* ========= *
+ * CONSTANTS *
+ * ========= */
 const codefield = document.getElementsByClassName("codefield")[0]
 const snip = `
 package main
@@ -11,9 +11,9 @@ func main() {
 	fmt.Println("hello, world!")
 }`.trim()
 
-/*
- * GAME STATE
- */
+/* ========== *
+ * GAME STATE *
+ * ========== */
 let correctChars = 5
 let incorrectChars = 10
 
@@ -41,14 +41,52 @@ const renderSnippet = (snip, correctChars, incorrectChars) => {
 	})
 }
 
+// mapKeyToChar maps a key, as in the key field of a KeyboardEvent, to the character it represents.
+const mapKeyToChar = key => {
+	if(['Shift', 'Meta', 'Alt', 'Control', 'Backspace'].includes(key)){
+		return null
+	} else if (key === "Enter"){
+		return "\n"
+	} else if (key === 'Tab') {
+		return "\t"
+	} else {
+		return key
+	}
+}
+
 renderSnippet(snip, correctChars, incorrectChars)
 
 codefield.addEventListener("keydown", e => {
-	if (incorrectChars === 0) {
-		correctChars = e.key === "Backspace" ? correctChars - 1 : correctChars + 1
-	} else {
-		incorrectChars = e.key === "Backspace" ? Math.max(0, incorrectChars - 1) : incorrectChars + 1
+	if (e.key === "Tab") {
+		/* On Safari, pressing tab makes the browser focus the search field. calling e.preventDefault prevents this. */
+		e.preventDefault()
 	}
 
+	if(e.key === "Backspace") {
+		if (incorrectChars > 0) {
+			incorrectChars--
+		} else if (correctChars > 0) {
+			correctChars--
+		}
+		renderSnippet(snip, correctChars, incorrectChars)
+		return
+	}
+
+	char = mapKeyToChar(e.key)
+	if(char === null) {
+		return
+	}
+
+	if(incorrectChars > 0) {
+		incorrectChars++
+		renderSnippet(snip, correctChars, incorrectChars)
+		return
+	}
+
+	if(char === snip[correctChars]) {
+		correctChars++
+	} else {
+		incorrectChars++
+	}
 	renderSnippet(snip, correctChars, incorrectChars)
 })
