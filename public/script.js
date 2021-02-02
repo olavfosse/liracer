@@ -14,8 +14,8 @@ import "fmt"
 func main() {
 	fmt.Println("hello, world!")
 }`.trim()
-let correctChars = 5
-let incorrectChars = 10
+let correctChars = 0
+let incorrectChars = 0
 
 /* ========= *
  * FUNCTIONS *
@@ -68,6 +68,13 @@ const deleteCorrectChar = () => {
 	renderCodefield()
 }
 
+// restart restarts the game state.
+const restart = () => {
+	correctChars = 0
+	incorrectChars = 0
+	renderCodefield()
+}
+
 // mapKeyToChar maps a key, as in the key field of a KeyboardEvent, to the character it represents.
 const mapKeyToChar = key => {
 	if(['Shift', 'Meta', 'Alt', 'Control', 'Backspace'].includes(key)){
@@ -115,5 +122,9 @@ codefield.addEventListener("keydown", e => {
 		typeCorrectChar()
 	} else {
 		typeIncorrectChar()
+	}
+
+	if(correctChars === snip.length) {
+		restart()
 	}
 })
