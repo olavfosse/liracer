@@ -2,7 +2,11 @@
  * CONSTANTS *
  * ========= */
 const codefield = document.getElementsByClassName("codefield")[0]
-const snip = `
+
+/* ========== *
+ * GAME STATE *
+ * ========== */
+let snip = `
 package main
 
 import "fmt"
@@ -10,15 +14,14 @@ import "fmt"
 func main() {
 	fmt.Println("hello, world!")
 }`.trim()
-
-/* ========== *
- * GAME STATE *
- * ========== */
 let correctChars = 5
 let incorrectChars = 10
 
+/* ========= *
+ * FUNCTIONS *
+ * ========= */
 // renderSnippet renders a snippet snip to the codefield, overwriting any previous text.
-const renderSnippet = (snip, correctChars, incorrectChars) => {
+const renderCodefield = () => {
 	codefield.textContent = ""
 	snip.split("").forEach((c, i) => {
 		s = document.createElement("span")
@@ -41,6 +44,30 @@ const renderSnippet = (snip, correctChars, incorrectChars) => {
 	})
 }
 
+// typeIncorrectChar "types" a incorrect character, that is increments incorrectChars and renders codefield.
+const typeIncorrectChar = () => {
+	incorrectChars++
+	renderCodefield()
+}
+
+// deleteIncorrectChar "deletes" a incorrect character, that is it decrements incorrectChars and renders the codefield.
+const deleteIncorrectChar = () => {
+	incorrectChars--
+	renderCodefield()
+}
+
+// typeCorrectChar "types" a correct character, that is increments correctChars and renders codefield.
+const typeCorrectChar = () => {
+	correctChars++
+	renderCodefield()
+}
+
+// deleteCorrectChar "deletes" a correct character, that is it decrements correctChars and renders the codefield.
+const deleteCorrectChar = () => {
+	correctChars--
+	renderCodefield()
+}
+
 // mapKeyToChar maps a key, as in the key field of a KeyboardEvent, to the character it represents.
 const mapKeyToChar = key => {
 	if(['Shift', 'Meta', 'Alt', 'Control', 'Backspace'].includes(key)){
@@ -54,7 +81,10 @@ const mapKeyToChar = key => {
 	}
 }
 
-renderSnippet(snip, correctChars, incorrectChars)
+/* ============ *
+ * ENTRY POINTS *
+ * ============ */
+renderCodefield(snip, correctChars, incorrectChars)
 
 codefield.addEventListener("keydown", e => {
 	if (e.key === "Tab") {
@@ -64,11 +94,10 @@ codefield.addEventListener("keydown", e => {
 
 	if(e.key === "Backspace") {
 		if (incorrectChars > 0) {
-			incorrectChars--
+			deleteIncorrectChar()
 		} else if (correctChars > 0) {
-			correctChars--
+			deleteCorrectChar()
 		}
-		renderSnippet(snip, correctChars, incorrectChars)
 		return
 	}
 
@@ -78,15 +107,13 @@ codefield.addEventListener("keydown", e => {
 	}
 
 	if(incorrectChars > 0) {
-		incorrectChars++
-		renderSnippet(snip, correctChars, incorrectChars)
+		typeIncorrectChar()
 		return
 	}
 
 	if(char === snip[correctChars]) {
-		correctChars++
+		typeCorrectChar()
 	} else {
-		incorrectChars++
+		typeIncorrectChar()
 	}
-	renderSnippet(snip, correctChars, incorrectChars)
 })
