@@ -7,12 +7,24 @@ main {
     height: 100vh;
     width: 100vw;
     display: grid;
-    grid-template-columns: minmax(300px, 500px) minmax(750px, auto);
+    grid-template-columns: minmax(1fr, 500px) 3fr;
     grid-template-areas: "chat codefield";
 
     /* TODO: if the viewport is too narrow, dedicate all of it too the
        chat and output a message informing the user that they must
-       expand it to view the code.*/
+       expand it to view the code. */
+}
+
+@media (max-width: 900px) {
+    main {
+        display: block;
+    }
+    .chat {
+        height: 100%;
+    }
+    .codefield {
+        display: none;
+    }
 }
 
 .chat, .codefield {
