@@ -2,6 +2,10 @@
  * CONSTANTS *
  * ========= */
 const codefield = document.getElementsByClassName("codefield")[0]
+// TODO: Use wss:// protocol. Currently s/ws/wss/ results in "WebSocket network
+//       error: The operation couldn’t be completed. (OSStatus error -9847.)". I
+//       will figure out how to remedy this at a later time.
+const socket = new WebSocket(`ws://${document.location.host}/ws`)
 
 /* ========== *
  * GAME STATE *
@@ -44,25 +48,29 @@ const renderCodefield = () => {
 	})
 }
 
-// typeIncorrectChar "types" a incorrect character, that is increments incorrectChars and renders codefield.
+// typeIncorrectChar "types" a incorrect character, that is increments
+// incorrectChars and renders codefield.
 const typeIncorrectChar = () => {
 	incorrectChars++
 	renderCodefield()
 }
 
-// deleteIncorrectChar "deletes" a incorrect character, that is it decrements incorrectChars and renders the codefield.
+// deleteIncorrectChar "deletes" a incorrect character, that is it decrements
+// incorrectChars and renders the codefield.
 const deleteIncorrectChar = () => {
 	incorrectChars--
 	renderCodefield()
 }
 
-// typeCorrectChar "types" a correct character, that is increments correctChars and renders codefield.
+// typeCorrectChar "types" a correct character, that is increments correctChars
+// and renders codefield.
 const typeCorrectChar = () => {
 	correctChars++
 	renderCodefield()
 }
 
-// deleteCorrectChar "deletes" a correct character, that is it decrements correctChars and renders the codefield.
+// deleteCorrectChar "deletes" a correct character, that is it decrements
+// correctChars and renders the codefield.
 const deleteCorrectChar = () => {
 	correctChars--
 	renderCodefield()
@@ -75,7 +83,8 @@ const restart = () => {
 	renderCodefield()
 }
 
-// mapKeyToChar maps a key, as in the key field of a KeyboardEvent, to the character it represents.
+// mapKeyToChar maps a key, as in the key field of a KeyboardEvent, to the
+// character it represents.
 const mapKeyToChar = key => {
 	if(['Shift', 'Meta', 'Alt', 'Control', 'Backspace'].includes(key)){
 		return null
@@ -88,14 +97,15 @@ const mapKeyToChar = key => {
 	}
 }
 
-/* ============ *
- * ENTRY POINTS *
- * ============ */
+/* =========== *
+ * ENTRY POINT *
+ * =========== */
 renderCodefield(snip, correctChars, incorrectChars)
 
 codefield.addEventListener("keydown", e => {
 	if (e.key === "Tab") {
-		/* On Safari, pressing tab makes the browser focus the search field. calling e.preventDefault prevents this. */
+		// WHY: On Safari, pressing tab makes the browser focus the search
+		//      field. calling e.preventDefault prevents this.
 		e.preventDefault()
 	}
 
@@ -126,5 +136,18 @@ codefield.addEventListener("keydown", e => {
 
 	if(correctChars === snip.length) {
 		restart()
+	}
+})
+
+const ping = () => {
+	socket.send("ping")
+	console.log("wrote: ping")
+}
+
+socket.addEventListener('message', e => {
+	console.log("read: " + e.data)
+	if(e.data === 'ping') {
+		socket.send('pong')
+		console.log("wrote: pong")
 	}
 })
