@@ -49,13 +49,21 @@ const renderCodefield = () => {
 	})
 }
 
-// sendCorrectChars the number of correctly written characters, that is
+// send sends a JSON representation of obj to the server and logs it to the
+// console.
+const send = obj => {
+	s = JSON.stringify(obj)
+	console.log('write: ' + s)
+	socket.send(s)
+}
+
+// sendCorrectChars sends the number of correctly written characters, that is
 // correctChars, to the server.
 const sendCorrectChars = () => {
-	socket.send(JSON.stringify({
+	send({
 		messageType: "correctChars",
 		correctChars
-	}))
+	})
 }
 
 // typeIncorrectChar "types" a incorrect character, that is increments
