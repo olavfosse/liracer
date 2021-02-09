@@ -23,9 +23,6 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	conn.WriteMessage(websocket.TextMessage, []byte("ping"))
-	log.Println("wrote: ping")
-
 	for {
 		_, p, err := conn.ReadMessage()
 		if err != nil {
@@ -38,11 +35,6 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		s := string(p)
 		log.Println("read:", s)
-
-		if s == "ping" {
-			conn.WriteMessage(websocket.TextMessage, []byte("pong"))
-			log.Println("wrote: pong")
-		}
 	}
 }
 

@@ -24,7 +24,8 @@ let incorrectChars = 0
 /* ========= *
  * FUNCTIONS *
  * ========= */
-// renderSnippet renders a snippet snip to the codefield, overwriting any previous text.
+// renderSnippet renders a snippet snip to the codefield, overwriting any
+// previous text.
 const renderCodefield = () => {
 	codefield.textContent = ""
 	snip.split("").forEach((c, i) => {
@@ -48,6 +49,15 @@ const renderCodefield = () => {
 	})
 }
 
+// sendCorrectChars the number of correctly written characters, that is
+// correctChars, to the server.
+const sendCorrectChars = () => {
+	socket.send(JSON.stringify({
+		messageType: "correctChars",
+		correctChars
+	}))
+}
+
 // typeIncorrectChar "types" a incorrect character, that is increments
 // incorrectChars and renders codefield.
 const typeIncorrectChar = () => {
@@ -62,17 +72,20 @@ const deleteIncorrectChar = () => {
 	renderCodefield()
 }
 
-// typeCorrectChar "types" a correct character, that is increments correctChars
-// and renders codefield.
+// typeCorrectChar "types" a correct character, that is increments correctChars,
+// sends the updated correctChars to the server and renders the codefield.
 const typeCorrectChar = () => {
 	correctChars++
+	sendCorrectChars()
 	renderCodefield()
 }
 
 // deleteCorrectChar "deletes" a correct character, that is it decrements
-// correctChars and renders the codefield.
+// correctchars, sends the updated correctChars to the server correctChars and
+// renders the codefield.
 const deleteCorrectChar = () => {
 	correctChars--
+	sendCorrectChars()
 	renderCodefield()
 }
 
@@ -80,6 +93,7 @@ const deleteCorrectChar = () => {
 const restart = () => {
 	correctChars = 0
 	incorrectChars = 0
+	sendCorrectChars()
 	renderCodefield()
 }
 
@@ -102,6 +116,7 @@ const mapKeyToChar = key => {
  * =========== */
 renderCodefield(snip, correctChars, incorrectChars)
 
+// TODO: wait until socket connection is opened before registering event
 codefield.addEventListener("keydown", e => {
 	if (e.key === "Tab") {
 		// WHY: On Safari, pressing tab makes the browser focus the search
@@ -139,15 +154,6 @@ codefield.addEventListener("keydown", e => {
 	}
 })
 
-const ping = () => {
-	socket.send("ping")
-	console.log("wrote: ping")
-}
-
 socket.addEventListener('message', e => {
 	console.log("read: " + e.data)
-	if(e.data === 'ping') {
-		socket.send('pong')
-		console.log("wrote: pong")
-	}
 })
