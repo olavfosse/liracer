@@ -18,6 +18,7 @@ import "fmt"
 func main() {
 	fmt.Println("hello, world!")
 }`.trim()
+let opponentCorrectChars = -1
 let correctChars = 0
 let incorrectChars = 0
 
@@ -44,6 +45,9 @@ const renderCodefield = () => {
 		} else if (i === correctChars + incorrectChars) {
 			s.classList.add("codefield-character-player")
 		}
+		if (i === opponentCorrectChars) {
+			s.classList.add("codefield-character-opponent")
+		}
 
 		codefield.appendChild(s)
 	})
@@ -61,8 +65,8 @@ const send = obj => {
 // correctChars, to the server.
 const sendCorrectChars = () => {
 	send({
-		messageType: "correctChars",
-		correctChars
+		MessageType: "CorrectChars",
+		CorrectChars: correctChars
 	})
 }
 
@@ -164,4 +168,13 @@ codefield.addEventListener("keydown", e => {
 
 socket.addEventListener('message', e => {
 	console.log("read: " + e.data)
+	const m = JSON.parse(e.data)
+	switch(m.MessageType) {
+	case 'CorrectChars':
+		opponentCorrectChars = m.CorrectChars
+		renderCodefield()
+		break
+	default:
+		console.error('unhandled message type ' + m.MessageType)
+	}
 })

@@ -3,12 +3,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"os"
-	"unicode/utf8"
-
-	"github.com/gorilla/websocket"
 )
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
@@ -22,20 +20,34 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
+	// NB: possible race condition.
+	players = append(players, conn)
 
 	for {
-		_, p, err := conn.ReadMessage()
+		var ccm correctCharsMessage
+		err := conn.ReadJSON(&ccm)
 		if err != nil {
 			log.Println(err)
 			return
 		}
-		if !utf8.Valid(p) {
-			log.Println(p, "is not entirely valid UTF-8")
-			return
+		for _, p := range players {
+			p.WriteJSON(ccm)
 		}
-		s := string(p)
-		log.Println("read:", s)
 	}
+}
+
+type player *websocket.Conn
+
+// TODO: automatically remove disconnected players.
+var players []*websocket.Conn
+
+type baseMessage struct {
+	MessageType string
+}
+
+type correctCharsMessage struct {
+	baseMessage
+	CorrectChars int
 }
 
 func main() {
