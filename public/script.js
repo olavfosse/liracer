@@ -48,7 +48,6 @@ const renderCodefield = () => {
 			s.classList.add("codefield-character-player")
 		}
 		Object.values(opponentCorrectChars).forEach(correctChars => {
-			console.log(correctChars)
 			if (i === correctChars) {
 				s.classList.add("codefield-character-opponent")
 			}
@@ -178,7 +177,6 @@ socket.addEventListener('message', e => {
 	switch(m.MessageType) {
 	case 'CorrectChars':
 		opponentCorrectChars[m.PlayerId] = m.CorrectChars
-		console.log(opponentCorrectChars)
 		renderCodefield()
 		break
 	default:
