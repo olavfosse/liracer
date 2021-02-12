@@ -20,26 +20,19 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	// NB: possible race condition.
-	players = append(players, conn)
+	singletonGame.register <- conn
 
 	for {
 		var ccm correctCharsMessage
-		err := conn.ReadJSON(&ccm)
-		if err != nil {
+		if err := conn.ReadJSON(&ccm); err != nil {
 			log.Println(err)
+			singletonGame.unregister <- conn
 			return
 		}
-		for _, p := range players {
-			p.WriteJSON(ccm)
-		}
+		// NB: possible race condition
+		singletonGame.writeJSONToAllExcept(conn, ccm)
 	}
 }
-
-type player *websocket.Conn
-
-// TODO: automatically remove disconnected players.
-var players []*websocket.Conn
 
 type baseMessage struct {
 	MessageType string
@@ -48,6 +41,13 @@ type baseMessage struct {
 type correctCharsMessage struct {
 	baseMessage
 	CorrectChars int
+}
+
+var singletonGame *game
+
+func init() {
+	singletonGame = newGame()
+	go singletonGame.run()
 }
 
 func main() {
