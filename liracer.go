@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/fossegrim/play.liracer.org/game"
 )
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
@@ -20,17 +22,17 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	singletonGame.register <- conn
+	singletonGame.Register <- conn
 
 	for {
 		var ccm correctCharsMessage
 		if err := conn.ReadJSON(&ccm); err != nil {
 			log.Println(err)
-			singletonGame.unregister <- conn
+			singletonGame.Unregister <- conn
 			return
 		}
 		// NB: possible race condition
-		singletonGame.writeJSONToAllExcept(conn, ccm)
+		singletonGame.WriteJSONToAllExcept(conn, ccm)
 	}
 }
 
@@ -43,11 +45,11 @@ type correctCharsMessage struct {
 	CorrectChars int
 }
 
-var singletonGame *game
+var singletonGame *game.Game
 
 func init() {
-	singletonGame = newGame()
-	go singletonGame.run()
+	singletonGame = game.NewGame()
+	go singletonGame.Run()
 }
 
 func main() {
