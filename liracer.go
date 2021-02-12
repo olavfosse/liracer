@@ -22,17 +22,19 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	singletonGame.Register <- conn
-
+	id := singletonGame.RegisterPlayer(conn)
 	for {
-		var ccm correctCharsMessage
-		if err := conn.ReadJSON(&ccm); err != nil {
+		var ccmfp correctCharsMessageFromPlayer
+		if err := conn.ReadJSON(&ccmfp); err != nil {
 			log.Println(err)
-			singletonGame.Unregister <- conn
+			singletonGame.Unregister <- id
 			return
 		}
+		var ccmtp correctCharsMessageToPlayer
+		ccmtp.correctCharsMessageFromPlayer = ccmfp
+		ccmtp.PlayerId = id
 		// NB: possible race condition
-		singletonGame.WriteJSONToAllExcept(conn, ccm)
+		singletonGame.WriteJSONToAllExcept(id, ccmtp)
 	}
 }
 
@@ -40,9 +42,14 @@ type baseMessage struct {
 	MessageType string
 }
 
-type correctCharsMessage struct {
+type correctCharsMessageFromPlayer struct {
 	baseMessage
 	CorrectChars int
+}
+
+type correctCharsMessageToPlayer struct {
+	correctCharsMessageFromPlayer
+	PlayerId int
 }
 
 var singletonGame *game.Game

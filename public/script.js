@@ -18,7 +18,9 @@ import "fmt"
 func main() {
 	fmt.Println("hello, world!")
 }`.trim()
-let opponentCorrectChars = -1
+let opponentCorrectChars = {
+	// id: correctChars
+}
 let correctChars = 0
 let incorrectChars = 0
 
@@ -30,7 +32,7 @@ let incorrectChars = 0
 const renderCodefield = () => {
 	codefield.textContent = ""
 	snip.split("").forEach((c, i) => {
-		s = document.createElement("span")
+		const s = document.createElement("span")
 		if (c === "\n") {
 			s.textContent = "↵\n"
 			s.classList.add("codefield-character-newline")
@@ -45,9 +47,12 @@ const renderCodefield = () => {
 		} else if (i === correctChars + incorrectChars) {
 			s.classList.add("codefield-character-player")
 		}
-		if (i === opponentCorrectChars) {
-			s.classList.add("codefield-character-opponent")
-		}
+		Object.values(opponentCorrectChars).forEach(correctChars => {
+			console.log(correctChars)
+			if (i === correctChars) {
+				s.classList.add("codefield-character-opponent")
+			}
+		})
 
 		codefield.appendChild(s)
 	})
@@ -56,7 +61,7 @@ const renderCodefield = () => {
 // send sends a JSON representation of obj to the server and logs it to the
 // console.
 const send = obj => {
-	s = JSON.stringify(obj)
+	const s = JSON.stringify(obj)
 	console.log('write: ' + s)
 	socket.send(s)
 }
@@ -93,7 +98,7 @@ const typeCorrectChar = () => {
 }
 
 // deleteCorrectChar "deletes" a correct character, that is it decrements
-// correctchars, sends the updated correctChars to the server correctChars and
+// correctChars, sends the updated correctChars to the server correctChars and
 // renders the codefield.
 const deleteCorrectChar = () => {
 	correctChars--
@@ -105,6 +110,7 @@ const deleteCorrectChar = () => {
 const restart = () => {
 	correctChars = 0
 	incorrectChars = 0
+	opponentCorrectChars = {}
 	sendCorrectChars()
 	renderCodefield()
 }
@@ -145,7 +151,7 @@ codefield.addEventListener("keydown", e => {
 		return
 	}
 
-	char = mapKeyToChar(e.key)
+	const char = mapKeyToChar(e.key)
 	if(char === null) {
 		return
 	}
@@ -171,7 +177,8 @@ socket.addEventListener('message', e => {
 	const m = JSON.parse(e.data)
 	switch(m.MessageType) {
 	case 'CorrectChars':
-		opponentCorrectChars = m.CorrectChars
+		opponentCorrectChars[m.PlayerId] = m.CorrectChars
+		console.log(opponentCorrectChars)
 		renderCodefield()
 		break
 	default:
