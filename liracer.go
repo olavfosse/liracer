@@ -23,6 +23,16 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	id := singletonGame.RegisterPlayer(conn)
+	var smtp snippetMessageToPlayer
+	smtp.MessageType = "Snippet"
+	smtp.Snippet = `package main
+
+import "fmt"
+
+func main() {
+	fmt.Println("hello, world!")
+}`
+	conn.WriteJSON(smtp)
 	for {
 		var ccmfp correctCharsMessageFromPlayer
 		if err := conn.ReadJSON(&ccmfp); err != nil {
@@ -50,6 +60,11 @@ type correctCharsMessageFromPlayer struct {
 type correctCharsMessageToPlayer struct {
 	correctCharsMessageFromPlayer
 	PlayerId int
+}
+
+type snippetMessageToPlayer struct {
+	baseMessage
+	Snippet string
 }
 
 var singletonGame *game.Game

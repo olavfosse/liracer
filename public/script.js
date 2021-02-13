@@ -10,14 +10,7 @@ const socket = new WebSocket(`ws://${document.location.host}/ws`)
 /* ========== *
  * GAME STATE *
  * ========== */
-let snip = `
-package main
-
-import "fmt"
-
-func main() {
-	fmt.Println("hello, world!")
-}`.trim()
+let snip = ''
 let opponentCorrectChars = {
 	// id: correctChars
 }
@@ -177,6 +170,10 @@ socket.addEventListener('message', e => {
 	switch(m.MessageType) {
 	case 'CorrectChars':
 		opponentCorrectChars[m.PlayerId] = m.CorrectChars
+		renderCodefield()
+		break
+	case 'Snippet':
+		snip = m.Snippet
 		renderCodefield()
 		break
 	default:
