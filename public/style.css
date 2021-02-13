@@ -7,7 +7,7 @@ main {
     height: 100vh;
     width: 100vw;
     display: grid;
-    grid-template-columns: minmax(1fr, 500px) 3fr;
+    grid-template-columns: 400px 1fr;
     grid-template-areas: "chat codefield";
 
     /* TODO: if the viewport is too narrow, dedicate all of it too the
@@ -67,7 +67,7 @@ main {
    but not displaying them if a cursor is on them is
    confusing. Therefore we only display them if a cursor is on
    them. */
-   .codefield-character-newline {
+.codefield-character-newline {
     color: var(--layer-1-background);
 }
 .codefield-character-player.codefield-character-newline,
