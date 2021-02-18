@@ -2,11 +2,14 @@
 package main
 
 import (
+	"embed"
 	"fmt"
-	"github.com/gorilla/websocket"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/gorilla/websocket"
 
 	"github.com/fossegrim/play.liracer.org/game"
 )
@@ -74,8 +77,16 @@ func init() {
 	go singletonGame.Run()
 }
 
+//go:embed public
+var embedee embed.FS
+
 func main() {
-	http.Handle("/", http.FileServer(http.Dir("public")))
+	public, err := fs.Sub(embedee, "public")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	http.Handle("/", http.FileServer(http.FS(public)))
 	// NOTE: The game URLs have to be of a form something like
 	//       https://play.liracer.org/?gameid=myepicgameid or
 	//       https://play.liracer.org/id/anotherepicgameid since the
@@ -83,7 +94,7 @@ func main() {
 	http.HandleFunc("/ws", wsHandler)
 	address := "localhost:3000"
 	log.Println("listening on", address)
-	err := http.ListenAndServe(address, nil)
+	err = http.ListenAndServe(address, nil)
 	fmt.Fprintln(os.Stderr, err)
 	os.Exit(1)
 }
