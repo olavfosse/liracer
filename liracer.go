@@ -1,4 +1,3 @@
-// Serve ./public
 package main
 
 import (
@@ -9,9 +8,8 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/fossegrim/play.liracer.org/player"
 	"github.com/gorilla/websocket"
-
-	"github.com/fossegrim/play.liracer.org/game"
 )
 
 func wsHandler(w http.ResponseWriter, r *http.Request) {
@@ -25,60 +23,18 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
-	id := singletonGame.RegisterPlayer(conn)
-	var smtp snippetMessageToPlayer
-	smtp.MessageType = "Snippet"
-	smtp.Snippet = `package main
-
-import "fmt"
-
-func main() {
-	fmt.Println("hello, world!")
-}`
-	conn.WriteJSON(smtp)
-	for {
-		var ccmfp correctCharsMessageFromPlayer
-		if err := conn.ReadJSON(&ccmfp); err != nil {
-			log.Println(err)
-			singletonGame.Unregister <- id
-			return
-		}
-		var ccmtp correctCharsMessageToPlayer
-		ccmtp.correctCharsMessageFromPlayer = ccmfp
-		ccmtp.PlayerId = id
-		// NB: possible race condition
-		singletonGame.WriteJSONToAllExcept(id, ccmtp)
-	}
-}
-
-type baseMessage struct {
-	MessageType string
-}
-
-type correctCharsMessageFromPlayer struct {
-	baseMessage
-	CorrectChars int
-}
-
-type correctCharsMessageToPlayer struct {
-	correctCharsMessageFromPlayer
-	PlayerId int
-}
-
-type snippetMessageToPlayer struct {
-	baseMessage
-	Snippet string
-}
-
-var singletonGame *game.Game
-
-func init() {
-	singletonGame = game.NewGame()
-	go singletonGame.Run()
+	p := playerCreator.NewPlayer(conn)
+	p.Run()
 }
 
 //go:embed public
 var embedee embed.FS
+
+var playerCreator *player.PlayerCreator
+
+func init() {
+	playerCreator = player.NewPlayerCreator()
+}
 
 func main() {
 	public, err := fs.Sub(embedee, "public")

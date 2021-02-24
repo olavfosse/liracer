@@ -62,8 +62,9 @@ const send = obj => {
 // correctChars, to the server.
 const sendCorrectChars = () => {
 	send({
-		MessageType: "CorrectChars",
-		CorrectChars: correctChars
+		'CorrectCharsMsg': {
+			'CorrectChars': correctChars
+		}
 	})
 }
 
@@ -167,16 +168,24 @@ codefield.addEventListener("keydown", e => {
 socket.addEventListener('message', e => {
 	console.log("read: " + e.data)
 	const m = JSON.parse(e.data)
-	switch(m.MessageType) {
-	case 'CorrectChars':
-		opponentCorrectChars[m.PlayerId] = m.CorrectChars
+
+	if(m['CorrectChars'] !== undefined) {
+		opponentCorrectChars[m.PlayerId] = m['CorrectChars']
 		renderCodefield()
-		break
-	case 'Snippet':
-		snip = m.Snippet
-		renderCodefield()
-		break
-	default:
-		console.error('unhandled message type ' + m.MessageType)
+		return
 	}
+	if(m['SnippetMsg'] !== undefined) {
+		snip = m['SnippetMsg']['Snippet']
+		renderCodefield()
+		return
+	}
+	console.error('unhandled message type ' + m['MessageType'])
 })
+
+socket.onopen = () => {
+	send({
+		'JoinGameMsg': {
+			'GameId': 'dummygameid'
+		}
+	})
+}
