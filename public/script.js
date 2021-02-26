@@ -10,12 +10,18 @@ const socket = new WebSocket(`ws://${document.location.host}/ws`)
 /* ========== *
  * GAME STATE *
  * ========== */
-let snip = ''
+let snippet = undefined
 let opponentCorrectChars = {
 	// id: correctChars
 }
 let correctChars = 0
 let incorrectChars = 0
+
+/* =========== *
+ * OTHER STATE *
+ * =========== */
+let gameId = undefined
+let roundId = undefined
 
 /* ========= *
  * FUNCTIONS *
@@ -24,7 +30,7 @@ let incorrectChars = 0
 // previous text.
 const renderCodefield = () => {
 	codefield.textContent = ""
-	snip.split("").forEach((c, i) => {
+	snippet.split("").forEach((c, i) => {
 		const s = document.createElement("span")
 		if (c === "\n") {
 			s.textContent = "↵\n"
@@ -62,6 +68,7 @@ const send = obj => {
 // correctChars, to the server.
 const sendCorrectChars = () => {
 	send({
+		'RoundId': roundId,
 		'CorrectCharsMsg': {
 			'CorrectChars': correctChars
 		}
@@ -125,7 +132,7 @@ const mapKeyToChar = key => {
 /* =========== *
  * ENTRY POINT *
  * =========== */
-renderCodefield(snip, correctChars, incorrectChars)
+// renderCodefield(snip, correctChars, incorrectChars)
 
 // TODO: wait until socket connection is opened before registering event
 codefield.addEventListener("keydown", e => {
@@ -154,13 +161,13 @@ codefield.addEventListener("keydown", e => {
 		return
 	}
 
-	if(char === snip[correctChars]) {
+	if(char === snippet[correctChars]) {
 		typeCorrectChar()
 	} else {
 		typeIncorrectChar()
 	}
 
-	if(correctChars === snip.length) {
+	if(correctChars === snippet.length) {
 		restart()
 	}
 })
@@ -168,18 +175,25 @@ codefield.addEventListener("keydown", e => {
 socket.addEventListener('message', e => {
 	console.log("read: " + e.data)
 	const m = JSON.parse(e.data)
+	// invalidate messages meant for players in other games.
+	// if(m.GameId !== gameId) {
+	// 	return 
+	// }
 
-	if(m['CorrectChars'] !== undefined) {
-		opponentCorrectChars[m.PlayerId] = m['CorrectChars']
+	let isMessageHandled = false
+	// if(m['CorrectChars'] !== undefined) {
+	// 	isMessageHandled = true
+	// 	opponentCorrectChars[m.PlayerId] = m['CorrectChars']
+	// 	renderCodefield()
+	// }
+	if(m['SetGameStateMsg'] !== undefined) {
+		isMessageHandled = true
+		snippet = m['SetGameStateMsg']['Snippet']
 		renderCodefield()
-		return
 	}
-	if(m['SnippetMsg'] !== undefined) {
-		snip = m['SnippetMsg']['Snippet']
-		renderCodefield()
-		return
+	if(!isMessageHandled) {
+		alert('unhandled message: ' + e.data)
 	}
-	console.error('unhandled message type ' + m['MessageType'])
 })
 
 socket.onopen = () => {
@@ -189,3 +203,4 @@ socket.onopen = () => {
 		}
 	})
 }
+	// id: correctChars
