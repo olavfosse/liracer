@@ -10,12 +10,18 @@ const socket = new WebSocket(`ws://${document.location.host}/ws`)
 /* ========== *
  * GAME STATE *
  * ========== */
-let snip = ''
+let snip = undefined
 let opponentCorrectChars = {
 	// id: correctChars
 }
 let correctChars = 0
 let incorrectChars = 0
+
+/* =========== *
+ * OTHER STATE *
+ * =========== */
+let gameId = undefined
+let roundId = undefined
 
 /* ========= *
  * FUNCTIONS *
@@ -62,7 +68,8 @@ const send = obj => {
 // correctChars, to the server.
 const sendCorrectChars = () => {
 	send({
-		'CorrectCharsMsg': {
+		'RoundId': roundId,
+		'CorrectCharsIncomingMsg': {
 			'CorrectChars': correctChars
 		}
 	})
@@ -125,7 +132,7 @@ const mapKeyToChar = key => {
 /* =========== *
  * ENTRY POINT *
  * =========== */
-renderCodefield(snip, correctChars, incorrectChars)
+// renderCodefield(snip, correctChars, incorrectChars)
 
 // TODO: wait until socket connection is opened before registering event
 codefield.addEventListener("keydown", e => {
@@ -169,22 +176,25 @@ socket.addEventListener('message', e => {
 	console.log("read: " + e.data)
 	const m = JSON.parse(e.data)
 
+	let isMessageHandled = false
 	if(m['CorrectChars'] !== undefined) {
+		isMessageHandled = true
 		opponentCorrectChars[m.PlayerId] = m['CorrectChars']
 		renderCodefield()
-		return
 	}
-	if(m['SnippetMsg'] !== undefined) {
-		snip = m['SnippetMsg']['Snippet']
+	if(m['GameStateOutgoingMsg'] !== undefined) {
+		isMessageHandled = true
+		snip = m['GameStateOutgoingMsg']['Snippet']
 		renderCodefield()
-		return
 	}
-	console.error('unhandled message type ' + m['MessageType'])
+	if(!isMessageHandled) {
+		alert('unhandled message: ' + e.data)
+	}
 })
 
 socket.onopen = () => {
 	send({
-		'JoinGameMsg': {
+		'JoinGameIncomingMsg': {
 			'GameId': 'dummygameid'
 		}
 	})

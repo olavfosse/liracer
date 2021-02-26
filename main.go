@@ -72,15 +72,26 @@ func wsHandler(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
+		isMessageHandled := false
 		// NOTE: Instead of manually iterating through the struct fields
 		//       I could maybe use some form of reflection for this.
-		if m.JoinGameMsg != nil {
-			bs, err := json.Marshal(outgoingMsg{&SnippetMsg{snippet}})
+		if m.JoinGameIncomingMsg != nil {
+			isMessageHandled = true
+			bs, err := json.Marshal(outgoingMsg{
+				GameId: gameId("dummyvalue"),
+				GameStateOutgoingMsg: &GameStateOutgoingMsg{
+					RoundId: 1, // dummy value
+					Snippet: snippet,
+				},
+			})
 			if err != nil {
 				log.Println("error:", err)
 			} else {
 				p.send <- bs
 			}
+		}
+		if !isMessageHandled {
+			log.Printf("error: unhandled message: %q\n", bs)
 		}
 	}
 }
