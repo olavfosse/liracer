@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"sync"
 
 	"github.com/fossegrim/play.liracer.org/snippet"
 	"github.com/gorilla/websocket"
@@ -24,37 +25,9 @@ func HandlerFunc(w http.ResponseWriter, r *http.Request) {
 	}
 	p := &Player{
 		ID:   <-playerIdEmitter,
-		conn: conn, // MUST NOT BE WRITTEN DIRECTLY TO.
-		Send: make(chan []byte),
+		conn: conn,
 	}
-	go p.pumpFromSend()
-	p.handleIncomingMessages()
-}
 
-// pumpFromSend continually pumps the messages from p.Send to p's underlying
-// connection.
-//
-// THIS IS THE ONLY FUNCTION PERMITTED TO WRITE DIRECTLY TO p's UNDERLYING
-// CONNECTION. ONLY ONE pumpFromSend GOROUTINE IS PERMITTED TO EXIST PER p.
-func (p *Player) pumpFromSend() {
-	for {
-		bs := <-p.Send
-		err := p.conn.WriteMessage(websocket.TextMessage, bs)
-		if err != nil {
-			// TODO: actually close it
-			log.Println("error(closing connection):", err)
-			return
-		}
-	}
-}
-
-// handleIncomingMessages continually reads and handles incoming messages from
-// p's underlying connection.
-//
-// THIS IS THE ONLY FUNCTION PERMITTED TO READ DIRECTLY FROM p's UNDERLYING
-// CONNECTION. ONLY ONE handleIncomingMessages GOROUTINE IS PERMITTED TO EXIST
-// PER p.
-func (p *Player) handleIncomingMessages() {
 	for {
 		_, bs, err := p.conn.ReadMessage()
 		if err != nil {
@@ -62,6 +35,7 @@ func (p *Player) handleIncomingMessages() {
 			log.Println("error(closing connection):", err)
 			return
 		}
+		log.Printf("read: %q\n", bs)
 		var m incomingMsg
 		err = json.Unmarshal(bs, &m)
 		if err != nil {
@@ -81,15 +55,29 @@ func (p *Player) handleIncomingMessages() {
 			)
 			if err != nil {
 				log.Println("error:", err)
-			} else {
-				p.Send <- bs
+				panic("marshalling an outgoingMsg should never result in an error")
 			}
+			err = p.WriteMessage(bs)
+			if err != nil {
+				// TODO: actually close it
+				log.Println("error(closing connection):", err)
+				return
+			}
+			log.Printf("wrote: %q\n", bs)
 		}
 		if !isMessageHandled {
 			log.Printf("error: unhandled message: %q\n", bs)
 		}
-
 	}
+}
+
+// WriteMessage writes bs to p's underlying connection in a concurrency-safe way.
+// It returns an error if the write failed.
+func (p *Player) WriteMessage(bs []byte) (err error) {
+	p.connWriteMu.Lock()
+	defer p.connWriteMu.Unlock()
+
+	return p.conn.WriteMessage(websocket.TextMessage, bs)
 }
 
 type PlayerID int
@@ -97,10 +85,9 @@ type PlayerID int
 type Player struct {
 	// ID identifies Player.
 	ID PlayerID
-	// conn is Player's underlying connection.
-	conn *websocket.Conn
-	// Send is a channel for writing to Player's underlying connection.
-	Send chan []byte
+
+	connWriteMu sync.Mutex
+	conn        *websocket.Conn
 }
 
 // playerIdEmitter generates PlayerIds. It first produces PlayerId(1). Thereafter
