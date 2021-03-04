@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/fossegrim/play.liracer.org/msg"
 	"github.com/fossegrim/play.liracer.org/room"
 	"github.com/gorilla/websocket"
 )
@@ -28,20 +27,17 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 	for {
 		_, bs, err := p.conn.ReadMessage()
 		if err != nil {
-			// TODO: actually close it
 			log.Println("error(closing connection):", err)
 			room.Singleton.Unregister(p)
 			return
 		}
 		log.Printf("read: %q\n", bs)
-		var m msg.IncomingMsg
+		var m incomingMsg
 		err = json.Unmarshal(bs, &m)
 		if err != nil {
 			log.Println("error:", err)
 			continue
 		}
-
-		// EVT: refactor til handleSetRoomStateMsg, handleYMsg,...
 
 		isMessageHandled := false
 		if m.JoinRoomMsg != nil {
@@ -49,15 +45,15 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 
 			room.Singleton.Register(p)
 			bs, err := json.Marshal(
-				msg.OutgoingMsg{
-					SetRoomStateMsg: &msg.SetRoomStateOutgoingMsg{
+				outgoingMsg{
+					SetRoomStateMsg: &SetRoomStateOutgoingMsg{
 						Snippet: room.Singleton.Snippet(),
 					},
 				},
 			)
 			if err != nil {
 				log.Println("error:", err)
-				panic("marshalling a msg.OutgoingMsg should never result in an error")
+				panic("marshalling a outgoingMsg should never result in an error")
 			}
 			err = p.WriteMessage(bs)
 			if err != nil {
@@ -66,6 +62,23 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 			log.Printf("wrote: %q\n", bs)
+		}
+		if m.CorrectCharsMsg != nil {
+			isMessageHandled = true
+
+			bs, err := json.Marshal(
+				outgoingMsg{
+					OpponentCorrectCharsMsg: &OpponentCorrectCharsIncomingMsg{
+						OpponentID:   p.ID,
+						CorrectChars: m.CorrectCharsMsg.CorrectChars,
+					},
+				},
+			)
+			if err != nil {
+				log.Println("error:", err)
+				panic("marshalling a outgoingMsg should never result in an error")
+			}
+			room.Singleton.SendToAllExcept(p, bs)
 		}
 		if !isMessageHandled {
 			log.Printf("error: unhandled message: %q\n", bs)

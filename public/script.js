@@ -177,14 +177,19 @@ socket.addEventListener('message', e => {
 	const m = JSON.parse(e.data)
 
 	let isMessageHandled = false
-	// if(m['CorrectChars'] !== undefined) {
-	// 	isMessageHandled = true
-	// 	opponentCorrectChars[m.PlayerID] = m['CorrectChars']
-	// 	renderCodefield()
-	// }
-	if(m['SetRoomStateMsg'] !== undefined) {
+
+	if(m['SetRoomStateMsg'] !== null) {
 		isMessageHandled = true
-		snippet = m['SetRoomStateMsg']['Snippet']
+		const payload = m['SetRoomStateMsg']
+
+		snippet = payload['Snippet']
+		renderCodefield()
+	}
+	if(m['OpponentCorrectCharsMsg'] !== null) {
+		isMessageHandled = true
+		const payload = m['OpponentCorrectCharsMsg']
+
+		opponentCorrectChars[payload['OpponentID']] = payload['CorrectChars']
 		renderCodefield()
 	}
 	if(!isMessageHandled) {
