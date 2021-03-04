@@ -8,11 +8,11 @@ const codefield = document.getElementsByClassName("codefield")[0]
 const socket = new WebSocket(`ws://${document.location.host}/ws`)
 
 /* ========== *
- * GAME STATE *
+ * ROOM STATE *
  * ========== */
 let snippet = undefined
 let opponentCorrectChars = {
-	// id: correctChars
+	// ID: correctChars
 }
 let correctChars = 0
 let incorrectChars = 0
@@ -20,8 +20,8 @@ let incorrectChars = 0
 /* =========== *
  * OTHER STATE *
  * =========== */
-let gameId = undefined
-let roundId = undefined
+let roomID = undefined
+let roundID = undefined
 
 /* ========= *
  * FUNCTIONS *
@@ -68,7 +68,7 @@ const send = obj => {
 // correctChars, to the server.
 const sendCorrectChars = () => {
 	send({
-		'RoundId': roundId,
+		'RoundID': roundID,
 		'CorrectCharsMsg': {
 			'CorrectChars': correctChars
 		}
@@ -106,7 +106,7 @@ const deleteCorrectChar = () => {
 	renderCodefield()
 }
 
-// restart restarts the game state.
+// restart restarts the room state.
 const restart = () => {
 	correctChars = 0
 	incorrectChars = 0
@@ -175,20 +175,16 @@ codefield.addEventListener("keydown", e => {
 socket.addEventListener('message', e => {
 	console.log("read: " + e.data)
 	const m = JSON.parse(e.data)
-	// invalidate messages meant for players in other games.
-	// if(m.GameId !== gameId) {
-	// 	return 
-	// }
 
 	let isMessageHandled = false
 	// if(m['CorrectChars'] !== undefined) {
 	// 	isMessageHandled = true
-	// 	opponentCorrectChars[m.PlayerId] = m['CorrectChars']
+	// 	opponentCorrectChars[m.PlayerID] = m['CorrectChars']
 	// 	renderCodefield()
 	// }
-	if(m['SetGameStateMsg'] !== undefined) {
+	if(m['SetRoomStateMsg'] !== undefined) {
 		isMessageHandled = true
-		snippet = m['SetGameStateMsg']['Snippet']
+		snippet = m['SetRoomStateMsg']['Snippet']
 		renderCodefield()
 	}
 	if(!isMessageHandled) {
@@ -198,9 +194,8 @@ socket.addEventListener('message', e => {
 
 socket.onopen = () => {
 	send({
-		'JoinGameMsg': {
-			'GameId': 'dummygameid'
+		'JoinRoomMsg': {
+			'RoomID': 'dummyroomID'
 		}
 	})
 }
-	// id: correctChars

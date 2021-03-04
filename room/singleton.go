@@ -1,6 +1,6 @@
-package game
+package room
 
-var Singleton *Game
+var Singleton *Room
 
 func init() {
 	Singleton = New()

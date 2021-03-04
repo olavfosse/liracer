@@ -2,13 +2,13 @@ package msg
 
 // OutgoingMsg is used to marshal outgoing messages.
 type OutgoingMsg struct {
-	// If the SetGameStateMsg field is non-nil, this field is used to tell a
-	// player to set their snippet  to SetGameStateMsg.Snippet.
-	SetGameStateMsg *SetGameStateOutgoingMsg
+	// If the SetRoomStateMsg field is non-nil, this field is used to tell a
+	// player to set their snippet  to SetRoomStateMsg.Snippet.
+	SetRoomStateMsg *SetRoomStateOutgoingMsg
 }
 
-// SetGameStateOutgoingMsg is used exclusively as an optional field of
+// SetRoomStateOutgoingMsg is used exclusively as an optional field of
 // OutgoingMsg. Therefore the documentation for it lives there.
-type SetGameStateOutgoingMsg struct {
+type SetRoomStateOutgoingMsg struct {
 	Snippet string
 }
