@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/fossegrim/play.liracer.org/gamehubplayer/player"
+	"github.com/fossegrim/play.liracer.org/player"
 )
 
 func main() {

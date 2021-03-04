@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/fossegrim/play.liracer.org/game"
 	"github.com/fossegrim/play.liracer.org/msg"
-	"github.com/fossegrim/play.liracer.org/snippet"
 	"github.com/gorilla/websocket"
 )
 
@@ -30,6 +30,7 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			// TODO: actually close it
 			log.Println("error(closing connection):", err)
+			game.Singleton.Unregister(p)
 			return
 		}
 		log.Printf("read: %q\n", bs)
@@ -45,10 +46,12 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 		isMessageHandled := false
 		if m.JoinGameMsg != nil {
 			isMessageHandled = true
+
+			game.Singleton.Register(p)
 			bs, err := json.Marshal(
 				msg.OutgoingMsg{
 					SetGameStateMsg: &msg.SetGameStateOutgoingMsg{
-						Snippet: snippet.Random(),
+						Snippet: game.Singleton.Snippet(),
 					},
 				},
 			)
@@ -58,8 +61,8 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 			}
 			err = p.WriteMessage(bs)
 			if err != nil {
-				// TODO: actually close it
 				log.Println("error(closing connection):", err)
+				game.Singleton.Unregister(p)
 				return
 			}
 			log.Printf("wrote: %q\n", bs)

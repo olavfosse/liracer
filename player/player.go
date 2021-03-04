@@ -1,6 +1,7 @@
 package player
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/gorilla/websocket"
@@ -29,9 +30,9 @@ func New(conn *websocket.Conn) *Player {
 }
 
 var (
-	// nextID is the ID that the next created player will have.
-	nextID   ID = 1
 	nextIDMu sync.Mutex
+	// nextID is the ID that the next created player will have.
+	nextID ID = 1
 )
 
 // WriteMessage writes bs to p's underlying connection in a concurrency-safe way.
@@ -41,4 +42,8 @@ func (p *Player) WriteMessage(bs []byte) (err error) {
 	defer p.connWriteMu.Unlock()
 
 	return p.conn.WriteMessage(websocket.TextMessage, bs)
+}
+
+func (p *Player) String() string {
+	return fmt.Sprintf("Player %d", p.ID)
 }
