@@ -31,18 +31,50 @@ main {
     background: var(--layer-1-background);
 
     box-sizing: border-box;
-    padding: 16px;
     border-top-color: var(--layer-2-background);
     border-top-style: solid;
     border-top-width: 30px;
 }
-.chat { grid-area: chat; }
+.chat {
+    grid-area: chat;
+    grid-template-rows: auto 55px;
+    grid-template-areas: "messages"
+                         "form";
+    display: grid;
+}
+.chat-messages {
+    grid-area: messages;
+}
+.chat-form {
+    grid-area: form;
+    padding: 8px;
+    gap: 8px;
+
+    display: grid;
+    grid-template-columns: auto 75px;
+    background: var(--layer-2-background)
+}
+.chat-form-text-field, .chat-form-send-button {
+    background: var(--layer-1-background);
+    outline:none;
+    border: 0;
+}
+.chat-form-send-button {
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: bold;
+    transition-duration: 0.12s;
+}
+.chat-form-send-button:hover {
+    background: var(--layer-2-background);
+}
 .codefield {
     margin: 0;
     font-family: 'JetBrains Mono', monospace;
     font-size: 14px;
     grid-area: codefield;
     outline: none;
+    padding: 16px;
 }
 
 /* Jeg tenker det er best å farge bokstavene i javascript. kanjse, kanskje ikke. */

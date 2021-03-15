@@ -12,7 +12,13 @@
   </head>
   <body>
     <main>
-      <div class="chat"></div>
+      <div class="chat">
+        <div class="chat-messages"></div>
+        <form class="chat-form">
+          <input class="chat-form-text-field" value="whatev">
+          <button class="chat-form-send-button">SEND</button>
+        </form>
+      </div>
       <!-- NOTE: tabindex="0" is REQUIRED for allowing codefield to receive keydown events. -->
       <pre class="codefield" tabindex="0"></pre>
     </main>
