@@ -178,9 +178,9 @@ socket.addEventListener('message', e => {
 
 	let isMessageHandled = false
 
-	if(m['SetRoomStateMsg'] !== null) {
+	if(m['NewRoundMsg'] !== null) {
 		isMessageHandled = true
-		const payload = m['SetRoomStateMsg']
+		const payload = m['NewRoundMsg']
 
 		snippet = payload['Snippet']
 		renderCodefield()

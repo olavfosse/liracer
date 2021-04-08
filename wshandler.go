@@ -28,7 +28,7 @@ func newWsHandler() func(http.ResponseWriter, *http.Request) {
 		rm.register(p)
 		bs, err := json.Marshal(
 			outgoingMsg{
-				SetRoomStateMsg: &SetRoomStateOutgoingMsg{
+				NewRoundMsg: &NewRoundOutgoingMsg{
 					Snippet: rm.snippet,
 				},
 			},
