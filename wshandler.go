@@ -60,27 +60,37 @@ func newWsHandler() func(http.ResponseWriter, *http.Request) {
 				continue
 			}
 
-			isMessageHandled := false
-			if m.CorrectCharsMsg != nil {
-				isMessageHandled = true
-
-				bs, err := json.Marshal(
-					outgoingMsg{
-						OpponentCorrectCharsMsg: &OpponentCorrectCharsIncomingMsg{
-							OpponentID:   p.id,
-							CorrectChars: m.CorrectCharsMsg.CorrectChars,
-						},
+			if m.CorrectCharsMsg == nil {
+				log.Printf("error: unhandled message: %q\n", bs)
+				continue
+			}
+			if m.CorrectCharsMsg.CorrectChars == len(rm.snippet) {
+				rm.snippet = randomSnippet()
+				bs, err := json.Marshal(outgoingMsg{
+					NewRoundMsg: &NewRoundOutgoingMsg{
+						Snippet: rm.snippet,
 					},
-				)
+				})
 				if err != nil {
 					log.Println("error:", err)
 					panic("marshalling a outgoingMsg should never result in an error")
 				}
-				rm.sendToAllExcept(p, bs)
+				rm.sendToAll(bs)
+				continue
 			}
-			if !isMessageHandled {
-				log.Printf("error: unhandled message: %q\n", bs)
+			bs, err = json.Marshal(
+				outgoingMsg{
+					OpponentCorrectCharsMsg: &OpponentCorrectCharsIncomingMsg{
+						OpponentID:   p.id,
+						CorrectChars: m.CorrectCharsMsg.CorrectChars,
+					},
+				},
+			)
+			if err != nil {
+				log.Println("error:", err)
+				panic("marshalling a outgoingMsg should never result in an error")
 			}
+			rm.sendToAllExcept(p, bs)
 		}
 	}
 }

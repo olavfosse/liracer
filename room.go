@@ -47,3 +47,12 @@ func (r *room) sendToAllExcept(p *player, bs []byte) {
 		}
 	}
 }
+
+// sendToAll sends bs to all players in r. sendToAll is concurrency-safe.
+func (r *room) sendToAll(bs []byte) {
+	r.playersMu.Lock()
+	defer r.playersMu.Unlock()
+	for pp := range r.players {
+		pp.writeMessage(bs)
+	}
+}

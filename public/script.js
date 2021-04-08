@@ -183,6 +183,7 @@ socket.addEventListener('message', e => {
 		const payload = m['NewRoundMsg']
 
 		snippet = payload['Snippet']
+		correctChars = 0
 		renderCodefield()
 	}
 	if(m['OpponentCorrectCharsMsg'] !== null) {
