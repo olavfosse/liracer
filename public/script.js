@@ -196,11 +196,3 @@ socket.addEventListener('message', e => {
 		alert('unhandled message: ' + e.data)
 	}
 })
-
-socket.onopen = () => {
-	send({
-		'JoinRoomMsg': {
-			'RoomID': 'dummyroomID'
-		}
-	})
-}

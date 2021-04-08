@@ -25,6 +25,26 @@ func newWsHandler() func(http.ResponseWriter, *http.Request) {
 		}
 		p := newPlayer(conn)
 
+		rm.register(p)
+		bs, err := json.Marshal(
+			outgoingMsg{
+				SetRoomStateMsg: &SetRoomStateOutgoingMsg{
+					Snippet: rm.snippet,
+				},
+			},
+		)
+		if err != nil {
+			log.Println("error:", err)
+			panic("marshalling a outgoingMsg should never result in an error")
+		}
+		err = p.writeMessage(bs)
+		if err != nil {
+			log.Println("error(closing connection):", err)
+			rm.unregister(p)
+			return
+		}
+		log.Printf("wrote: %q\n", bs)
+
 		for {
 			_, bs, err := p.conn.ReadMessage()
 			if err != nil {
@@ -41,29 +61,6 @@ func newWsHandler() func(http.ResponseWriter, *http.Request) {
 			}
 
 			isMessageHandled := false
-			if m.JoinRoomMsg != nil {
-				isMessageHandled = true
-
-				rm.register(p)
-				bs, err := json.Marshal(
-					outgoingMsg{
-						SetRoomStateMsg: &SetRoomStateOutgoingMsg{
-							Snippet: rm.snippet,
-						},
-					},
-				)
-				if err != nil {
-					log.Println("error:", err)
-					panic("marshalling a outgoingMsg should never result in an error")
-				}
-				err = p.writeMessage(bs)
-				if err != nil {
-					log.Println("error(closing connection):", err)
-					rm.unregister(p)
-					return
-				}
-				log.Printf("wrote: %q\n", bs)
-			}
 			if m.CorrectCharsMsg != nil {
 				isMessageHandled = true
 
