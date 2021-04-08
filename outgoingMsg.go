@@ -1,4 +1,4 @@
-package player
+package main
 
 // outgoingMsg is used to marshal outgoing messages.
 type outgoingMsg struct {
@@ -21,6 +21,6 @@ type SetRoomStateOutgoingMsg struct {
 // OpponentCorrectCharsIncomingMsg is used exclusively as an optional field of
 // outgoingMsg. Therefore the documentation for it lives there.
 type OpponentCorrectCharsIncomingMsg struct {
-	OpponentID   ID
+	OpponentID   id
 	CorrectChars int
 }

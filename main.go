@@ -5,8 +5,6 @@ import (
 	"io/fs"
 	"log"
 	"net/http"
-
-	"github.com/fossegrim/play.liracer.org/player"
 )
 
 func main() {
@@ -19,7 +17,7 @@ func main() {
 	//       https://play.liracer.org/?gameid=myepicgameid or
 	//       https://play.liracer.org/id/anotherepicgameid since the
 	//       previous URL form conflicts with the ws endpoint URL.
-	http.HandleFunc("/ws", player.WsHandler)
+	http.HandleFunc("/ws", wsHandler)
 	address := "localhost:3000"
 	log.Println("listening on", address)
 	log.Fatalln(http.ListenAndServe(address, nil))

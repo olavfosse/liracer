@@ -1,4 +1,4 @@
-package player
+package main
 
 // incomingMsg is used to unmarshal incoming messages.
 type incomingMsg struct {

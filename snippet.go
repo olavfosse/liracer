@@ -1,7 +1,7 @@
-package snippet
+package main
 
-// Random returns a random snippet.
-func Random() string {
+// random returns a random snippet.
+func randomSnippet() string {
 	return `package main
 
 import fmt

@@ -1,11 +1,10 @@
-package player
+package main
 
 import (
 	"encoding/json"
 	"log"
 	"net/http"
 
-	"github.com/fossegrim/play.liracer.org/room"
 	"github.com/gorilla/websocket"
 )
 
@@ -14,21 +13,28 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
-// WsHandler is a http handler function, for use with http.HandleFunc, which
+// TODO: remove global variable
+var singletonRoom *room
+
+func init() {
+	singletonRoom = newRoom()
+}
+
+// wsHandler is a http handler function, for use with http.HandleFunc, which
 // is used to set up the WebSocket endpoint that players interact with.
-func WsHandler(w http.ResponseWriter, r *http.Request) {
+func wsHandler(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	p := New(conn)
+	p := newPlayer(conn)
 
 	for {
 		_, bs, err := p.conn.ReadMessage()
 		if err != nil {
 			log.Println("error(closing connection):", err)
-			room.Singleton.Unregister(p)
+			singletonRoom.unregister(p)
 			return
 		}
 		log.Printf("read: %q\n", bs)
@@ -43,11 +49,11 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 		if m.JoinRoomMsg != nil {
 			isMessageHandled = true
 
-			room.Singleton.Register(p)
+			singletonRoom.register(p)
 			bs, err := json.Marshal(
 				outgoingMsg{
 					SetRoomStateMsg: &SetRoomStateOutgoingMsg{
-						Snippet: room.Singleton.Snippet(),
+						Snippet: singletonRoom.snippet,
 					},
 				},
 			)
@@ -55,10 +61,10 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 				log.Println("error:", err)
 				panic("marshalling a outgoingMsg should never result in an error")
 			}
-			err = p.WriteMessage(bs)
+			err = p.writeMessage(bs)
 			if err != nil {
 				log.Println("error(closing connection):", err)
-				room.Singleton.Unregister(p)
+				singletonRoom.unregister(p)
 				return
 			}
 			log.Printf("wrote: %q\n", bs)
@@ -69,7 +75,7 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 			bs, err := json.Marshal(
 				outgoingMsg{
 					OpponentCorrectCharsMsg: &OpponentCorrectCharsIncomingMsg{
-						OpponentID:   p.ID,
+						OpponentID:   p.id,
 						CorrectChars: m.CorrectCharsMsg.CorrectChars,
 					},
 				},
@@ -78,7 +84,7 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 				log.Println("error:", err)
 				panic("marshalling a outgoingMsg should never result in an error")
 			}
-			room.Singleton.SendToAllExcept(p, bs)
+			singletonRoom.sendToAllExcept(p, bs)
 		}
 		if !isMessageHandled {
 			log.Printf("error: unhandled message: %q\n", bs)
