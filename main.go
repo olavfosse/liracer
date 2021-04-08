@@ -2,11 +2,9 @@ package main
 
 import (
 	"embed"
-	"fmt"
 	"io/fs"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/fossegrim/play.liracer.org/player"
 )
@@ -14,8 +12,7 @@ import (
 func main() {
 	public, err := fs.Sub(embedee, "public")
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err)
-		os.Exit(1)
+		log.Fatalln(err)
 	}
 	http.Handle("/", http.FileServer(http.FS(public)))
 	// NOTE: The game URLs have to be of a form something like
@@ -25,9 +22,7 @@ func main() {
 	http.HandleFunc("/ws", player.WsHandler)
 	address := "localhost:3000"
 	log.Println("listening on", address)
-	err = http.ListenAndServe(address, nil)
-	fmt.Fprintln(os.Stderr, err)
-	os.Exit(1)
+	log.Fatalln(http.ListenAndServe(address, nil))
 }
 
 //go:embed public
