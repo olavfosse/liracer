@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"log"
 	"sync"
+
+	"github.com/gorilla/websocket"
 )
 
 type room struct {
@@ -21,28 +23,12 @@ func newRoom() *room {
 	}
 }
 
-// register registers p to r. register is concurrency-safe.
-func (r *room) register(p *player) {
-	r.Lock()
-	defer r.Unlock()
-	r.players[p] = struct{}{}
-	log.Printf("registered %v to room, there are now %d players in the room\n", p, len(r.players))
-}
-
-// unregister unregisters p from r. unregister is concurrency-safe.
-func (r *room) unregister(p *player) {
-	r.Lock()
-	defer r.Unlock()
-	delete(r.players, p)
-	log.Printf("unregistered %v from room, there are now %d players in the room\n", p, len(r.players))
-}
-
 // CONCURRENCY_UNSAFE_sendToAllExcept sends bs to all players in r except p.
 // CONCURRENCY_UNSAFE_sendToAllExcept is not concurrency safe.
 func (r *room) CONCURRENCY_UNSAFE_sendToAllExcept(p *player, bs []byte) {
 	for pp := range r.players {
 		if p != pp {
-			pp.writeMessage(bs)
+			pp.WriteMessage(websocket.TextMessage, bs)
 		}
 	}
 }
@@ -51,7 +37,7 @@ func (r *room) CONCURRENCY_UNSAFE_sendToAllExcept(p *player, bs []byte) {
 // CONCURRENCY_UNSAFE_sendToAll is not concurrency-safe.
 func (r *room) CONCURRENCY_UNSAFE_sendToAll(bs []byte) {
 	for pp := range r.players {
-		pp.writeMessage(bs)
+		pp.WriteMessage(websocket.TextMessage, bs)
 	}
 }
 
@@ -85,4 +71,26 @@ func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 		panic("marshalling a outgoingMsg should never result in an error")
 	}
 	r.CONCURRENCY_UNSAFE_sendToAllExcept(p, bs)
+}
+
+func (r *room) handlePlayerJoined(p *player) {
+	r.Lock()
+	defer r.Unlock()
+
+	r.players[p] = struct{}{}
+	log.Printf("registered %v to room, there are now %d players in the room\n", p, len(r.players))
+
+	bs, err := json.Marshal(
+		outgoingMsg{
+			NewRoundMsg: &NewRoundOutgoingMsg{
+				Snippet: r.snippet,
+			},
+		},
+	)
+	if err != nil {
+		log.Println("error:", err)
+		panic("marshalling a outgoingMsg should never result in an error")
+	}
+	p.WriteMessage(websocket.TextMessage, bs)
+	log.Printf("wrote: %q\n", bs)
 }

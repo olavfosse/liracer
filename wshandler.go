@@ -24,32 +24,12 @@ func newWsHandler() func(http.ResponseWriter, *http.Request) {
 			return
 		}
 		p := newPlayer(conn)
-
-		rm.register(p)
-		bs, err := json.Marshal(
-			outgoingMsg{
-				NewRoundMsg: &NewRoundOutgoingMsg{
-					Snippet: rm.snippet,
-				},
-			},
-		)
-		if err != nil {
-			log.Println("error:", err)
-			panic("marshalling a outgoingMsg should never result in an error")
-		}
-		err = p.writeMessage(bs)
-		if err != nil {
-			log.Println("error(closing connection):", err)
-			rm.unregister(p)
-			return
-		}
-		log.Printf("wrote: %q\n", bs)
+		rm.handlePlayerJoined(p)
 
 		for {
-			_, bs, err := p.conn.ReadMessage()
+			_, bs, err := p.ReadMessage()
 			if err != nil {
 				log.Println("error(closing connection):", err)
-				rm.unregister(p)
 				return
 			}
 			log.Printf("read: %q\n", bs)
