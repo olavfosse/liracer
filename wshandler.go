@@ -29,19 +29,20 @@ func newWsHandler() func(http.ResponseWriter, *http.Request) {
 		for {
 			_, bs, err := p.ReadMessage()
 			if err != nil {
-				log.Println("error(closing connection):", err)
+				log.Printf("%v: read failed: %s\n", p, err)
+				rm.handlePlayerLeft(p)
 				return
 			}
-			log.Printf("read from %v: %q\n", p, bs)
+			log.Printf("%v: read message %q\n", p, bs)
 			var m incomingMsg
 			err = json.Unmarshal(bs, &m)
 			if err != nil {
-				log.Println("error:", err)
+				log.Printf("%v: unmarshal failed: %s", p, err)
 				continue
 			}
 
 			if m.CorrectCharsMsg == nil {
-				log.Printf("error: unhandled message: %q\n", bs)
+				log.Printf("%v: unhandled message %q\n", p, bs)
 				continue
 			}
 			rm.handlePlayerTypedCorrectChars(p, m.CorrectCharsMsg.CorrectChars)

@@ -10,7 +10,7 @@ import (
 
 type room struct {
 	sync.Mutex
-	// players is the set of players currently in Room.
+	// players is the set of players currently in room.
 	players map[*player]struct{}
 	snippet string
 	roundId roundId
@@ -27,24 +27,15 @@ func newRoom() *room {
 	}
 }
 
-// CONCURRENCY_UNSAFE_sendToAllExcept sends bs to all players in r except p.
-// CONCURRENCY_UNSAFE_sendToAllExcept is not concurrency safe.
-func (r *room) CONCURRENCY_UNSAFE_sendToAllExcept(p *player, bs []byte) {
-	for pp := range r.players {
-		if p != pp {
-			pp.WriteMessage(websocket.TextMessage, bs)
-		}
+// CONCURRENCY_UNSAFE_sendTo sends bs to p. If an error occurs p it is logged.
+// CONCURRENCY_UNSAFE_sendTo is not concurrency safe.
+func (r *room) sendTo(p *player, bs []byte) {
+	err := p.WriteMessage(websocket.TextMessage, bs)
+	if err != nil {
+		log.Printf("room: write to %v failed: %s\n", p, err)
+		return
 	}
-	log.Printf("wrote to all players except %v: %q\n", p, bs)
-}
-
-// CONCURRENCY_UNSAFE_sendToAll sends bs to all players in r.
-// CONCURRENCY_UNSAFE_sendToAll is not concurrency-safe.
-func (r *room) CONCURRENCY_UNSAFE_sendToAll(bs []byte) {
-	for pp := range r.players {
-		pp.WriteMessage(websocket.TextMessage, bs)
-	}
-	log.Printf("wrote to all players: %q\n", bs)
+	log.Printf("room: wrote to %v %q\n", p, bs)
 }
 
 func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
@@ -62,10 +53,11 @@ func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 			},
 		})
 		if err != nil {
-			log.Println("error:", err)
 			panic("marshalling a outgoingMsg should never result in an error")
 		}
-		r.CONCURRENCY_UNSAFE_sendToAll(bs)
+		for pp := range r.players {
+			r.sendTo(pp, bs)
+		}
 		return
 	}
 	bs, err := json.Marshal(
@@ -78,10 +70,13 @@ func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 		},
 	)
 	if err != nil {
-		log.Println("error:", err)
 		panic("marshalling a outgoingMsg should never result in an error")
 	}
-	r.CONCURRENCY_UNSAFE_sendToAllExcept(p, bs)
+	for pp := range r.players {
+		if pp != p {
+			r.sendTo(pp, bs)
+		}
+	}
 }
 
 func (r *room) handlePlayerJoined(p *player) {
@@ -89,7 +84,7 @@ func (r *room) handlePlayerJoined(p *player) {
 	defer r.Unlock()
 
 	r.players[p] = struct{}{}
-	log.Printf("registered %v to room, there are now %d players in the room\n", p, len(r.players))
+	log.Printf("room: %v joined, there are now %d players\n", p, len(r.players))
 
 	bs, err := json.Marshal(
 		outgoingMsg{
@@ -101,9 +96,15 @@ func (r *room) handlePlayerJoined(p *player) {
 		},
 	)
 	if err != nil {
-		log.Println("error:", err)
 		panic("marshalling a outgoingMsg should never result in an error")
 	}
-	p.WriteMessage(websocket.TextMessage, bs)
-	log.Printf("wrote: %q\n", bs)
+	r.sendTo(p, bs)
+}
+
+func (r *room) handlePlayerLeft(p *player) {
+	r.Lock()
+	defer r.Unlock()
+
+	delete(r.players, p)
+	log.Printf("room: %v left, there are now %d players\n", p, len(r.players))
 }
