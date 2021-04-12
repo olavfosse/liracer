@@ -32,7 +32,7 @@ func newWsHandler() func(http.ResponseWriter, *http.Request) {
 				log.Println("error(closing connection):", err)
 				return
 			}
-			log.Printf("read: %q\n", bs)
+			log.Printf("read from %v: %q\n", p, bs)
 			var m incomingMsg
 			err = json.Unmarshal(bs, &m)
 			if err != nil {

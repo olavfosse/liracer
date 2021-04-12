@@ -34,5 +34,5 @@ var (
 )
 
 func (p *player) String() string {
-	return fmt.Sprintf("Player %d", p.id)
+	return fmt.Sprintf("player %d", p.id)
 }

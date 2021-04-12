@@ -70,7 +70,8 @@ const sendCorrectChars = () => {
 	send({
 		'RoundID': roundID,
 		'CorrectCharsMsg': {
-			'CorrectChars': correctChars
+			'CorrectChars': correctChars,
+			'RoundId': roundID,
 		}
 	})
 }
@@ -182,17 +183,23 @@ socket.addEventListener('message', e => {
 		isMessageHandled = true
 		const payload = m['NewRoundMsg']
 
-		snippet = payload['Snippet']
-		correctChars = 0
-		incorrectChars = 0
-		renderCodefield()
+		if(roundID === undefined || payload['RoundId'] === roundID) {
+			snippet = payload['Snippet']
+			roundID = payload['NewRoundId']
+			correctChars = 0
+			incorrectChars = 0
+			opponentCorrectChars = {}
+			renderCodefield()
+		}
 	}
 	if(m['OpponentCorrectCharsMsg'] !== null) {
 		isMessageHandled = true
 		const payload = m['OpponentCorrectCharsMsg']
 
-		opponentCorrectChars[payload['OpponentID']] = payload['CorrectChars']
-		renderCodefield()
+		if(roundID === undefined || payload['RoundId'] === roundID) {
+			opponentCorrectChars[payload['OpponentID']] = payload['CorrectChars']
+			renderCodefield()
+		}
 	}
 	if(!isMessageHandled) {
 		alert('unhandled message: ' + e.data)

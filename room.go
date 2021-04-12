@@ -13,13 +13,17 @@ type room struct {
 	// players is the set of players currently in Room.
 	players map[*player]struct{}
 	snippet string
+	roundId roundId
 }
+
+type roundId int
 
 // newRoom creates a new room with a random snippet.
 func newRoom() *room {
 	return &room{
 		players: make(map[*player]struct{}),
 		snippet: randomSnippet(),
+		roundId: 1,
 	}
 }
 
@@ -31,6 +35,7 @@ func (r *room) CONCURRENCY_UNSAFE_sendToAllExcept(p *player, bs []byte) {
 			pp.WriteMessage(websocket.TextMessage, bs)
 		}
 	}
+	log.Printf("wrote to all players except %v: %q\n", p, bs)
 }
 
 // CONCURRENCY_UNSAFE_sendToAll sends bs to all players in r.
@@ -39,6 +44,7 @@ func (r *room) CONCURRENCY_UNSAFE_sendToAll(bs []byte) {
 	for pp := range r.players {
 		pp.WriteMessage(websocket.TextMessage, bs)
 	}
+	log.Printf("wrote to all players: %q\n", bs)
 }
 
 func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
@@ -46,9 +52,13 @@ func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 	defer r.Unlock()
 	if correctChars == len(r.snippet) {
 		r.snippet = randomSnippet()
+		oldId := r.roundId
+		r.roundId++
 		bs, err := json.Marshal(outgoingMsg{
 			NewRoundMsg: &NewRoundOutgoingMsg{
-				Snippet: r.snippet,
+				Snippet:    r.snippet,
+				NewRoundId: r.roundId,
+				RoundId:    oldId,
 			},
 		})
 		if err != nil {
@@ -63,6 +73,7 @@ func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 			OpponentCorrectCharsMsg: &OpponentCorrectCharsIncomingMsg{
 				OpponentID:   p.id,
 				CorrectChars: correctChars,
+				RoundId:      r.roundId,
 			},
 		},
 	)
@@ -83,7 +94,9 @@ func (r *room) handlePlayerJoined(p *player) {
 	bs, err := json.Marshal(
 		outgoingMsg{
 			NewRoundMsg: &NewRoundOutgoingMsg{
-				Snippet: r.snippet,
+				Snippet:    r.snippet,
+				NewRoundId: r.roundId,
+				RoundId:    0,
 			},
 		},
 	)
