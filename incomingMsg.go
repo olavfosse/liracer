@@ -8,6 +8,9 @@ type incomingMsg struct {
 	// CorrectCharsMsg.RoundId is used for invalidating the message in case it
 	// "belongs" to a previous round.
 	CorrectCharsMsg *CorrectCharsIncomingMsg
+	// If the ChatMessageMsg field is non-nil, this field is used by the players
+	// to send a chat message with content ChatMessageMsg.Content.
+	ChatMessageMsg *ChatMessageIncomingMsg
 }
 
 // CorrectCharsIncomingMsg is used exclusively as an optional field of
@@ -15,4 +18,10 @@ type incomingMsg struct {
 type CorrectCharsIncomingMsg struct {
 	CorrectChars int
 	RoundId      roundId
+}
+
+// ChatMessageIncomingMsg is used exclusively as an optional field of
+// incomingMsg. Therefore the documentation for it lives there.
+type ChatMessageIncomingMsg struct {
+	Content string
 }

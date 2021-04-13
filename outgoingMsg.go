@@ -13,7 +13,8 @@ type outgoingMsg struct {
 	// OpponentCorrectCharsMsg.CorrectChars characters correctly.
 	// OpponentCorrectCharsMsg.RoundId is used for invalidating the message in
 	// case it "belongs" to a previous round.
-	OpponentCorrectCharsMsg *OpponentCorrectCharsIncomingMsg
+	OpponentCorrectCharsMsg *OpponentCorrectCharsOutgoingMsg
+	ChatMessageMsg          *ChatMessageOutgoingMsg
 }
 
 // NewRoundOutgoingMsg is used exclusively as an optional field of outgoingMsg.
@@ -24,10 +25,17 @@ type NewRoundOutgoingMsg struct {
 	RoundId    roundId
 }
 
-// OpponentCorrectCharsIncomingMsg is used exclusively as an optional field of
+// OpponentCorrectCharsOutgoingMsg is used exclusively as an optional field of
 // outgoingMsg. Therefore the documentation for it lives there.
-type OpponentCorrectCharsIncomingMsg struct {
-	OpponentID   id
+type OpponentCorrectCharsOutgoingMsg struct {
+	OpponentID   playerId
 	CorrectChars int
 	RoundId      roundId
+}
+
+// ChatMessageOutgoingMsg is used exclusively as an optional field of
+// outgoingMsg. Therefore the documentation for it lives there.
+type ChatMessageOutgoingMsg struct {
+	Content  string
+	Opponent playerId
 }

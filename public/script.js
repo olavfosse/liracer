@@ -201,7 +201,36 @@ socket.addEventListener('message', e => {
 			renderCodefield()
 		}
 	}
+	if(m['ChatMessageMsg'] !== null) {
+		isMessageHandled = true
+		const payload = m['ChatMessageMsg']
+
+		const chatMessage = document.createElement('div')
+		chatMessage.className = 'chat-message'
+
+		const chatMessageSender = document.createElement('span')
+		chatMessageSender.className = 'chat-message-sender'
+		chatMessageSender.textContent = `<Player ${payload.Opponent}>`
+		chatMessage.appendChild(chatMessageSender)
+
+		const chatMessageContent = document.createElement('span')
+		chatMessageContent.className = 'chat-message-content'
+		chatMessageContent.textContent = payload.Content
+		chatMessage.appendChild(chatMessageContent)
+
+		const chatMessages = document.getElementsByClassName('chat-messages')[0]
+		chatMessages.append(chatMessage)
+	}
 	if(!isMessageHandled) {
 		alert('unhandled message: ' + e.data)
 	}
+})
+
+
+const chatForm = document.getElementsByClassName('chat-form')[0]
+const chatFormTextField = document.getElementsByClassName('chat-form-text-field')[0]
+chatForm.addEventListener('submit', event => {
+	event.preventDefault()
+	send({'ChatMessageMsg': {'Content': chatFormTextField.value}})
+	chatFormTextField.value = ''
 })

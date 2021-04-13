@@ -62,7 +62,7 @@ func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 	}
 	bs, err := json.Marshal(
 		outgoingMsg{
-			OpponentCorrectCharsMsg: &OpponentCorrectCharsIncomingMsg{
+			OpponentCorrectCharsMsg: &OpponentCorrectCharsOutgoingMsg{
 				OpponentID:   p.id,
 				CorrectChars: correctChars,
 				RoundId:      r.roundId,
@@ -76,6 +76,24 @@ func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 		if pp != p {
 			r.sendTo(pp, bs)
 		}
+	}
+}
+
+func (r *room) handlePlayerSentChatMessage(p *player, content string) {
+	r.Lock()
+	defer r.Unlock()
+	bs, err := json.Marshal(outgoingMsg{
+		ChatMessageMsg: &ChatMessageOutgoingMsg{
+			Content:  content,
+			Opponent: p.id,
+		},
+	})
+	if err != nil {
+		panic("marshalling a outgoingMsg should never result in an error")
+	}
+
+	for p := range r.players {
+		r.sendTo(p, bs)
 	}
 }
 

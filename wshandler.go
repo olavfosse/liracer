@@ -41,11 +41,20 @@ func newWsHandler() func(http.ResponseWriter, *http.Request) {
 				continue
 			}
 
-			if m.CorrectCharsMsg == nil {
-				log.Printf("%v: unhandled message %q\n", p, bs)
-				continue
+			messageUnhandled := true
+
+			if m.CorrectCharsMsg != nil {
+				messageUnhandled = false
+				rm.handlePlayerTypedCorrectChars(p, m.CorrectCharsMsg.CorrectChars)
 			}
-			rm.handlePlayerTypedCorrectChars(p, m.CorrectCharsMsg.CorrectChars)
+
+			if m.ChatMessageMsg != nil {
+				messageUnhandled = false
+				rm.handlePlayerSentChatMessage(p, m.ChatMessageMsg.Content)
+			}
+			if messageUnhandled {
+				log.Printf("%v: unhandled message %q\n", p, bs)
+			}
 		}
 	}
 }

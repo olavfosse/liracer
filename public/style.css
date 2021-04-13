@@ -15,6 +15,12 @@ main {
        expand it to view the code. */
 }
 
+* {
+    /* Using a monospace font for everything is arguably a design smell, but it
+       is good enough for now. */
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+}
 @media (max-width: 900px) {
     main {
         display: block;
@@ -34,6 +40,8 @@ main {
     border-top-color: var(--layer-2-background);
     border-top-style: solid;
     border-top-width: 30px;
+
+    margin: 0;
 }
 .chat {
     grid-area: chat;
@@ -44,6 +52,12 @@ main {
 }
 .chat-messages {
     grid-area: messages;
+    padding: 16px;
+    color: var(--layer-2-foreground);
+}
+.chat-message-sender {
+    font-weight: bold;
+    margin-right: 0.43em;
 }
 .chat-form {
     grid-area: form;
@@ -61,8 +75,8 @@ main {
 }
 .chat-form-send-button {
     border-radius: 5px;
-    font-size: 13px;
     font-weight: bold;
+    color: var(--layer-2-foreground);
     transition-duration: 0.12s;
 }
 .chat-form-send-button:hover {
@@ -70,8 +84,6 @@ main {
 }
 .codefield {
     margin: 0;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 14px;
     grid-area: codefield;
     outline: none;
     padding: 16px;
