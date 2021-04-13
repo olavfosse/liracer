@@ -1,6 +1,8 @@
-body { margin: 0; }
-main {
+body {
+    margin: 0;
     background: var(--layer-0-background);
+}
+main {
     box-sizing: border-box;
     padding: var(--window-gap);
     gap: var(--window-gap);
