@@ -14,7 +14,10 @@ type outgoingMsg struct {
 	// OpponentCorrectCharsMsg.RoundId is used for invalidating the message in
 	// case it "belongs" to a previous round.
 	OpponentCorrectCharsMsg *OpponentCorrectCharsOutgoingMsg
-	ChatMessageMsg          *ChatMessageOutgoingMsg
+	// If the ChatMessageMsg field is non-nil, this field is used to send a chat
+	// message with content ChatMessageMsg.Content and sender
+	// ChatMessageMsg.Sender.
+	ChatMessageMsg *ChatMessageOutgoingMsg
 }
 
 // NewRoundOutgoingMsg is used exclusively as an optional field of outgoingMsg.
@@ -36,6 +39,6 @@ type OpponentCorrectCharsOutgoingMsg struct {
 // ChatMessageOutgoingMsg is used exclusively as an optional field of
 // outgoingMsg. Therefore the documentation for it lives there.
 type ChatMessageOutgoingMsg struct {
-	Content  string
-	Opponent playerId
+	Content string
+	Sender  string
 }

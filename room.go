@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"sync"
 
@@ -82,10 +83,11 @@ func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 func (r *room) handlePlayerSentChatMessage(p *player, content string) {
 	r.Lock()
 	defer r.Unlock()
+
 	bs, err := json.Marshal(outgoingMsg{
 		ChatMessageMsg: &ChatMessageOutgoingMsg{
-			Content:  content,
-			Opponent: p.id,
+			Content: content,
+			Sender:  p.String(),
 		},
 	})
 	if err != nil {
@@ -117,6 +119,21 @@ func (r *room) handlePlayerJoined(p *player) {
 		panic("marshalling a outgoingMsg should never result in an error")
 	}
 	r.sendTo(p, bs)
+
+	for pp := range r.players {
+		bs, err := json.Marshal(
+			outgoingMsg{
+				ChatMessageMsg: &ChatMessageOutgoingMsg{
+					Content: fmt.Sprintf("%s joined the room", p),
+					Sender:  "liracer",
+				},
+			},
+		)
+		if err != nil {
+			panic("marshalling a outgoingMsg should never result in an error")
+		}
+		r.sendTo(pp, bs)
+	}
 }
 
 func (r *room) handlePlayerLeft(p *player) {
@@ -125,4 +142,19 @@ func (r *room) handlePlayerLeft(p *player) {
 
 	delete(r.players, p)
 	log.Printf("room: %v left, there are now %d players\n", p, len(r.players))
+
+	for pp := range r.players {
+		bs, err := json.Marshal(
+			outgoingMsg{
+				ChatMessageMsg: &ChatMessageOutgoingMsg{
+					Content: fmt.Sprintf("%s left the room", p),
+					Sender:  "liracer",
+				},
+			},
+		)
+		if err != nil {
+			panic("marshalling a outgoingMsg should never result in an error")
+		}
+		r.sendTo(pp, bs)
+	}
 }

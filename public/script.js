@@ -210,7 +210,7 @@ socket.addEventListener('message', e => {
 
 		const chatMessageSender = document.createElement('span')
 		chatMessageSender.className = 'chat-message-sender'
-		chatMessageSender.textContent = `<Player ${payload.Opponent}>`
+		chatMessageSender.textContent = '<' +payload.Sender +'>'
 		chatMessage.appendChild(chatMessageSender)
 
 		const chatMessageContent = document.createElement('span')

@@ -17,20 +17,20 @@ type playerId int
 // newPlayer creates a new player with a unique ID. newPlayer is concurrency
 // safe.
 func newPlayer(conn *websocket.Conn) *player {
-	nextIDMu.Lock()
-	defer nextIDMu.Unlock()
+	nextPlayerIDMu.Lock()
+	defer nextPlayerIDMu.Unlock()
 	p := &player{
 		conn,
-		nextID,
+		nextPlayerId,
 	}
-	nextID++
+	nextPlayerId++
 	return p
 }
 
 var (
-	nextIDMu sync.Mutex
-	// nextID is the ID that the next created player will have.
-	nextID playerId = 1
+	nextPlayerIDMu sync.Mutex
+	// nextPlayerId is the id that the next created player will have.
+	nextPlayerId playerId = 1
 )
 
 func (p *player) String() string {
