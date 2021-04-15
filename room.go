@@ -6,6 +6,7 @@ import (
 	"log"
 	"sync"
 
+	"github.com/fossegrim/play.liracer.org/snippet"
 	"github.com/gorilla/websocket"
 )
 
@@ -13,7 +14,7 @@ type room struct {
 	sync.Mutex
 	// players is the set of players currently in room.
 	players map[*player]struct{}
-	snippet string
+	snippet snippet.Snippet
 	roundId roundId
 }
 
@@ -23,7 +24,7 @@ type roundId int
 func newRoom() *room {
 	return &room{
 		players: make(map[*player]struct{}),
-		snippet: randomSnippet(),
+		snippet: snippet.Random(),
 		roundId: 1,
 	}
 }
@@ -42,13 +43,14 @@ func (r *room) sendTo(p *player, bs []byte) {
 func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 	r.Lock()
 	defer r.Unlock()
-	if correctChars == len(r.snippet) {
-		r.snippet = randomSnippet()
+	if correctChars == len(r.snippet.Code) {
+		snip := snippet.Random()
+		r.snippet = snip
 		oldId := r.roundId
 		r.roundId++
 		bs, err := json.Marshal(outgoingMsg{
 			NewRoundMsg: &NewRoundOutgoingMsg{
-				Snippet:    r.snippet,
+				Snippet:    r.snippet.Code,
 				NewRoundId: r.roundId,
 				RoundId:    oldId,
 			},
@@ -109,7 +111,7 @@ func (r *room) handlePlayerJoined(p *player) {
 	bs, err := json.Marshal(
 		outgoingMsg{
 			NewRoundMsg: &NewRoundOutgoingMsg{
-				Snippet:    r.snippet,
+				Snippet:    r.snippet.Code,
 				NewRoundId: r.roundId,
 				RoundId:    0,
 			},
