@@ -56,10 +56,13 @@ main {
     grid-area: messages;
     padding: 16px;
     color: var(--layer-2-foreground);
+    overflow-x: hidden;
+    overflow-wrap: break-word;
 }
 .chat-message-sender {
     font-weight: bold;
     margin-right: 0.43em;
+    white-space: nowrap;
 }
 .chat-form {
     grid-area: form;
