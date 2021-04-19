@@ -1,4 +1,9 @@
-body {
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: url("/JetBrainsMonoNL-Regular.ttf")
+}
+
+* {
     /* lengths */
     --toolbar-height: 30px;
     --window-gap: 32px;
@@ -10,4 +15,10 @@ body {
     --layer-2-foreground:         #4D444A;
     --cursor-player-background:   #cebaa6;
     --cursor-opponent-background: #baba70;
+
+    /* typography */
+    /* Using a monospace font for everything is arguably a design smell, but it
+       is good enough for now. */
+    font-family: "JetBrains Mono";
+    font-size: 14px;
 }
