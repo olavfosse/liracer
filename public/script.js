@@ -119,7 +119,8 @@ const restart = () => {
 // mapKeyToChar maps a key, as in the key field of a KeyboardEvent, to the
 // character it represents.
 const mapKeyToChar = key => {
-	if(['Shift', 'Meta', 'Alt', 'Control', 'Backspace'].includes(key)){
+	console.log(key)
+	if(['Shift', 'Meta', 'Alt', 'AltGraph', 'Control', 'Backspace'].includes(key)){
 		return null
 	} else if (key === "Enter"){
 		return "\n"
