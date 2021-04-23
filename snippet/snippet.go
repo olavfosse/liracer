@@ -4,6 +4,7 @@ import (
 	"embed"
 	"log"
 	"math/rand"
+	"strings"
 )
 
 //go:embed c/* go/* javascript/* shellscript/*
@@ -28,6 +29,7 @@ func init() {
 				log.Fatalln("snippets:", err)
 			}
 			code := string(bs)
+			code = strings.Replace(code, "\r\n", "\n", -1)
 			snip := Snippet{
 				Name:     snippetFile.Name(),
 				Code:     code,
