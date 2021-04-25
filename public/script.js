@@ -32,25 +32,25 @@ const renderCodefield = () => {
 	codefield.textContent = ""
 	snippet.split("").forEach((c, i) => {
 		const s = document.createElement("span")
-		if (c === "\n") {
-			s.textContent = "↵\n"
-			s.classList.add("codefield-character-newline")
-		} else {
-			s.textContent = c
-		}
-		s.classList.add("codefield-character")
+		s.textContent = c === "\n" ? s.textContent = "↵\n" : c
+
 		if (i < correctChars) {
-			s.classList.add("codefield-character-correct")
-		} else if (i < correctChars + incorrectChars) {
-			s.classList.add("codefield-character-incorrect")
-		} else if (i === correctChars + incorrectChars) {
-			s.classList.add("codefield-character-player")
+			s.style.setProperty('background', '#c5ddc5')
 		}
+
 		Object.values(opponentCorrectChars).forEach(correctChars => {
 			if (i === correctChars) {
-				s.classList.add("codefield-character-opponent")
+				s.style.setProperty('background', '#baba70')
 			}
 		})
+		
+		if (i >= correctChars && i < correctChars + incorrectChars) {
+			s.style.setProperty('background', '#dec5c5')
+		}
+
+		if (i === correctChars + incorrectChars) {
+			s.style.setProperty('background', '#cebaa6')
+		}
 
 		codefield.appendChild(s)
 	})

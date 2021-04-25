@@ -13,8 +13,6 @@
     --layer-1-background:         #eee8d5;
     --layer-2-background:         #ded8c5;
     --layer-2-foreground:         #4D444A;
-    --cursor-player-background:   #cebaa6;
-    --cursor-opponent-background: #baba70;
 
     /* typography */
     /* Using a monospace font for everything is arguably a design smell, but it

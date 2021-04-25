@@ -88,33 +88,7 @@ main {
     padding: 16px;
 }
 
-/* Jeg tenker det er best å farge bokstavene i javascript. kanjse, kanskje ikke. */
-/* Codefield */
-/* .codefield-character { */
-/*     color: var(--cursor-color); */
-/* } */
-
 .codefield-character {
-    color: var(--layer-2-foreground);
-}
-
-.codefield-character-correct {
-    color: green;
-}
-
-.codefield-character-incorrect {
-    color: red;
-}
-
-/* Newlines are an edgecase. Displaying them all the time looks ugly,
-   but not displaying them if a cursor is on them is
-   confusing. Therefore we only display them if a cursor is on
-   them. */
-.codefield-character-newline {
-    color: var(--layer-1-background);
-}
-.codefield-character-player.codefield-character-newline,
-.codefield-character-opponent.codefield-character-newline  {
     color: var(--layer-2-foreground);
 }
 
