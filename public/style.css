@@ -45,6 +45,7 @@ main {
     grid-template-areas: "messages"
                          "form";
     display: grid;
+    overflow-y: auto;
 }
 .chat-messages {
     grid-area: messages;
