@@ -219,10 +219,15 @@ socket.addEventListener('message', e => {
 		chatMessageContent.textContent = payload.Content
 		chatMessage.appendChild(chatMessageContent)
 
+		// When the user is scrolled all the way down in .chat-messages the chat
+		// automatically scrolls down when new messages are sent so that (s)he does
+		// not have to manually scroll down to see the latest message. If however
+		// the user scrolls up from the bottom, to look at previous messages, the
+		// chat does not automatically scroll down. 
 		const chatMessages = document.getElementsByClassName('chat-messages')[0]
-		const scrollWasOnbottom = Math.abs(chatMessages.scrollTop+chatMessages.offsetHeight-chatMessages.scrollHeight) <= 4
+		const isChatScrolledAllTheWayDown = Math.abs(chatMessages.scrollTop+chatMessages.offsetHeight-chatMessages.scrollHeight) <= 4
 		chatMessages.append(chatMessage)
-		if(scrollWasOnbottom) chatMessages.scrollTop = chatMessages.scrollHeight
+		if(isChatScrolledAllTheWayDown) chatMessages.scrollTop = chatMessages.scrollHeight
 	}
 	if(!isMessageHandled) {
 		alert('unhandled message: ' + e.data)
