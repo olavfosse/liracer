@@ -48,11 +48,25 @@ func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 		r.snippet = snip
 		oldId := r.roundId
 		r.roundId++
+
 		bs, err := json.Marshal(outgoingMsg{
 			NewRoundMsg: &NewRoundOutgoingMsg{
 				Snippet:    r.snippet.Code,
 				NewRoundId: r.roundId,
 				RoundId:    oldId,
+			},
+		})
+		if err != nil {
+			panic("marshalling a outgoingMsg should never result in an error")
+		}
+		for pp := range r.players {
+			r.sendTo(pp, bs)
+		}
+
+		bs, err = json.Marshal(outgoingMsg{
+			ChatMessageMsg: &ChatMessageOutgoingMsg{
+				Sender:  "liracer",
+				Content: fmt.Sprintf("%s won the round!", p),
 			},
 		})
 		if err != nil {
