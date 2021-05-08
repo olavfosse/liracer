@@ -43,7 +43,7 @@ const renderCodefield = () => {
 				s.style.setProperty('background', '#baba70')
 			}
 		})
-		
+
 		if (i >= correctChars && i < correctChars + incorrectChars) {
 			s.style.setProperty('background', '#dec5c5')
 		}
@@ -220,7 +220,9 @@ socket.addEventListener('message', e => {
 		chatMessage.appendChild(chatMessageContent)
 
 		const chatMessages = document.getElementsByClassName('chat-messages')[0]
+		const scrollWasOnbottom = Math.abs(chatMessages.scrollTop+chatMessages.offsetHeight-chatMessages.scrollHeight) <= 4
 		chatMessages.append(chatMessage)
+		if(scrollWasOnbottom) chatMessages.scrollTop = chatMessages.scrollHeight
 	}
 	if(!isMessageHandled) {
 		alert('unhandled message: ' + e.data)
