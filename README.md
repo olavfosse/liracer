@@ -13,4 +13,4 @@ The frontend is written in browser runable code, so no building is required for 
 Simply run `go build`. This produces a executable `play.liracer.org`. The executable is entirely self contained, it is statically linked and embeds the frontend
 
 ## License
-JetBrains Mono(Copyright The JetBrains Mono Project Authors) is licensed under the OFL1-1 license. The rest of the project, unless otherwise specified, is licensed under [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html) license.
+JetBrains Mono(Copyright The JetBrains Mono Project Authors) is licensed under the OFL1-1 license. The rest of the project, unless otherwise specified, is licensed under the [AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html) license.
