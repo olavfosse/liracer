@@ -2,10 +2,11 @@
  * CONSTANTS *
  * ========= */
 const codefield = document.getElementsByClassName("codefield")[0]
-// TODO: Use wss:// protocol. Currently s/ws/wss/ results in "WebSocket network
-//       error: The operation couldn’t be completed. (OSStatus error -9847.)". I
-//       will figure out how to remedy this at a later time.
-const socket = new WebSocket(`ws://${document.location.host}/ws`)
+let wsProtocol = 'ws:'
+if(location.protocol === 'https:') {
+    wsProtocol = 'wss:'
+}
+const socket = new WebSocket(`${wsProtocol}//${document.location.host}/ws`)
 
 /* ========== *
  * ROOM STATE *

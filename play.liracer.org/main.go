@@ -4,6 +4,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/caddyserver/certmagic"
 )
 
 func main() {
@@ -18,6 +20,11 @@ func main() {
 	if !ok {
 		log.Fatalln(`environment variable "ADDRESS" not pressent`)
 	}
+	_, useHTTPS := os.LookupEnv("USE_HTTPS")
 	log.Println("listening on", address)
-	log.Fatalln(http.ListenAndServe(address, nil))
+	if useHTTPS {
+		log.Fatalln(certmagic.HTTPS([]string{address}, nil))
+	} else {
+		log.Fatalln(http.ListenAndServe(address, nil))
+	}
 }
