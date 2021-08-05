@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"play.liracer.org/snippet"
@@ -16,6 +18,7 @@ type room struct {
 	players map[*player]struct{}
 	snippet snippet.Snippet
 	roundId roundId
+	started time.Time
 }
 
 type roundId int
@@ -26,6 +29,7 @@ func newRoom() *room {
 		players: make(map[*player]struct{}),
 		snippet: snippet.Random(),
 		roundId: 1,
+		started: time.Now(),
 	}
 }
 
@@ -48,6 +52,8 @@ func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 		r.snippet = snip
 		oldId := r.roundId
 		r.roundId++
+		oldStarted := r.started
+		r.started = time.Now()
 
 		bs, err := json.Marshal(outgoingMsg{
 			NewRoundMsg: &NewRoundOutgoingMsg{
@@ -66,7 +72,7 @@ func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 		bs, err = json.Marshal(outgoingMsg{
 			ChatMessageMsg: &ChatMessageOutgoingMsg{
 				Sender:  "liracer",
-				Content: fmt.Sprintf("%s won the round!", p),
+				Content: fmt.Sprintf("%s won the round, he or she typed it in %d seconds!", p, int(math.Round(r.started.Sub(oldStarted).Seconds()))),
 			},
 		})
 		if err != nil {
