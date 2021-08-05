@@ -1,0 +1,2 @@
+[ ] Host landing page på environment variable LIRACER_LANDING_PAGE_ADDRESS og selve spillet på environment variable LIRACER_GAME_ADDRESS.
+[ ] Sett opp certmagic

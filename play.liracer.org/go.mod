@@ -1,4 +1,4 @@
-module github.com/fossegrim/play.liracer.org
+module play.liracer.org
 
 go 1.16
 

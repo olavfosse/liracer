@@ -6,8 +6,8 @@ import (
 	"log"
 	"sync"
 
-	"github.com/fossegrim/play.liracer.org/snippet"
 	"github.com/gorilla/websocket"
+	"play.liracer.org/snippet"
 )
 
 type room struct {

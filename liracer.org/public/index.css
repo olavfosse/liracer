@@ -1,0 +1,82 @@
+@font-face {
+    font-family: 'JetBrains Mono';
+    src: url("/JetBrainsMonoNL-Regular.ttf")
+}
+
+* {
+    /* lengths */
+    --toolbar-height: 30px;
+    --window-gap: 32px;
+
+    /* colors */
+    --layer-0-background:         #fdf6e3;
+    --layer-1-background:         #eee8d5;
+    --layer-2-background:         #ded8c5;
+    --layer-2-foreground:         #4D444A;
+
+    /* typography */
+    /* Using a monospace font for everything is arguably a design smell, but it
+       is good enough for now. */
+    font-family: "JetBrains Mono";
+    font-size: 14px;
+}
+
+p {
+    max-width: 40em;
+}
+
+body {
+    background: var(--layer-0-background);
+    margin: var(--window-gap);
+}
+
+main {
+    border-top: solid var(--toolbar-height) var(--layer-2-background);
+    padding: 16px;
+    background: var(--layer-1-background);
+    color: var(--layer-1-foreground);
+}
+
+#liracer {
+    margin-top: 0;
+}
+
+h1 > a, h2 > a {
+    color: inherit;
+    text-decoration: none;
+}
+
+h1 > a:hover, h2 > a:hover {
+    text-decoration: underline;
+}
+
+hr {
+    color: var(--layer-2-background);
+    border-color: var(--layer-2-background);
+    background: var(--layer-2-background);
+}
+
+summary {
+    outline: none;
+}
+
+#call-to-action {
+    max-width: 350px;
+    height: 40px;
+    width: 100%;
+    border: solid var(--layer-2-background) 4px;
+    background: inherit;
+    color: inherit;
+    font-size: 16px;
+    font-weight: bold;
+    transition-duration: 0.12s;
+    cursor: pointer;
+}
+
+#call-to-action:hover {
+    background: var(--layer-2-background);
+}   
+
+#call-to-action:focus {
+    outline: none;
+}
