@@ -55,9 +55,9 @@ func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 
 	if correctChars == len(r.snippet.Code) {
 		chatMessageContent := fmt.Sprintf(
-			"%s won the round, he or she typed it in %d seconds",
+			"%s won the round, he or she typed it in %.2f seconds!",
 			p,
-			int(time.Since(r.playerTypedFirstCorrectChar[p]).Seconds()),
+			time.Since(r.playerTypedFirstCorrectChar[p]).Seconds(),
 		)
 		bs, err := json.Marshal(outgoingMsg{
 			ChatMessageMsg: &ChatMessageOutgoingMsg{
