@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"math"
 	"sync"
 	"time"
 
@@ -16,9 +15,11 @@ type room struct {
 	sync.Mutex
 	// players is the set of players currently in room.
 	players map[*player]struct{}
-	snippet snippet.Snippet
-	roundId roundId
-	started time.Time
+	// playerTypedFirstCorrectChar maps players to the points in time
+	// when they typed their first char correctly.
+	playerTypedFirstCorrectChar map[*player]time.Time
+	snippet                     snippet.Snippet
+	roundId                     roundId
 }
 
 type roundId int
@@ -26,10 +27,10 @@ type roundId int
 // newRoom creates a new room with a random snippet.
 func newRoom() *room {
 	return &room{
-		players: make(map[*player]struct{}),
-		snippet: snippet.Random(),
-		roundId: 1,
-		started: time.Now(),
+		players:                     make(map[*player]struct{}),
+		playerTypedFirstCorrectChar: make(map[*player]time.Time),
+		snippet:                     snippet.Random(),
+		roundId:                     1,
 	}
 }
 
@@ -47,19 +48,21 @@ func (r *room) sendTo(p *player, bs []byte) {
 func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 	r.Lock()
 	defer r.Unlock()
-	if correctChars == len(r.snippet.Code) {
-		snip := snippet.Random()
-		r.snippet = snip
-		oldId := r.roundId
-		r.roundId++
-		oldStarted := r.started
-		r.started = time.Now()
 
+	if correctChars == 1 {
+		r.playerTypedFirstCorrectChar[p] = time.Now()
+	}
+
+	if correctChars == len(r.snippet.Code) {
+		chatMessageContent := fmt.Sprintf(
+			"%s won the round, he or she typed it in %d seconds",
+			p,
+			int(time.Since(r.playerTypedFirstCorrectChar[p]).Seconds()),
+		)
 		bs, err := json.Marshal(outgoingMsg{
-			NewRoundMsg: &NewRoundOutgoingMsg{
-				Snippet:    r.snippet.Code,
-				NewRoundId: r.roundId,
-				RoundId:    oldId,
+			ChatMessageMsg: &ChatMessageOutgoingMsg{
+				Sender:  "liracer",
+				Content: chatMessageContent,
 			},
 		})
 		if err != nil {
@@ -69,10 +72,17 @@ func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 			r.sendTo(pp, bs)
 		}
 
+		snip := snippet.Random()
+		r.snippet = snip
+		oldId := r.roundId
+		r.roundId++
+		r.playerTypedFirstCorrectChar = make(map[*player]time.Time)
+
 		bs, err = json.Marshal(outgoingMsg{
-			ChatMessageMsg: &ChatMessageOutgoingMsg{
-				Sender:  "liracer",
-				Content: fmt.Sprintf("%s won the round, he or she typed it in %d seconds!", p, int(math.Round(r.started.Sub(oldStarted).Seconds()))),
+			NewRoundMsg: &NewRoundOutgoingMsg{
+				Snippet:    r.snippet.Code,
+				NewRoundId: r.roundId,
+				RoundId:    oldId,
 			},
 		})
 		if err != nil {
