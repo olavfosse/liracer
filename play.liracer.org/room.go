@@ -6,6 +6,7 @@ import (
 	"log"
 	"sync"
 	"time"
+	"unicode/utf8"
 
 	"github.com/gorilla/websocket"
 	"play.liracer.org/snippet"
@@ -54,10 +55,13 @@ func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 	}
 
 	if correctChars == len(r.snippet.Code) {
+		seconds := time.Since(r.playerTypedFirstCorrectChar[p]).Seconds()
+		characters := utf8.RuneCountInString(r.snippet.Code)
 		chatMessageContent := fmt.Sprintf(
-			"%s won the round, he or she typed it in %.2f seconds!",
+			"%s won the round, he or she typed it in %.2f seconds at %.2f characters per second!",
 			p,
-			time.Since(r.playerTypedFirstCorrectChar[p]).Seconds(),
+			seconds,
+			float64(characters)/seconds,
 		)
 		bs, err := json.Marshal(outgoingMsg{
 			ChatMessageMsg: &ChatMessageOutgoingMsg{
