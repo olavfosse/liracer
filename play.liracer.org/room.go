@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 	"sync"
 	"time"
 	"unicode/utf8"
@@ -35,8 +36,8 @@ func newRoom() *room {
 	}
 }
 
-// CONCURRENCY_UNSAFE_sendTo sends bs to p. If an error occurs p it is logged.
-// CONCURRENCY_UNSAFE_sendTo is not concurrency safe.
+// sendTo sends bs to p. If an error occurs p it is logged.  sendTo is
+// not concurrency safe.
 func (r *room) sendTo(p *player, bs []byte) {
 	err := p.WriteMessage(websocket.TextMessage, bs)
 	if err != nil {
@@ -44,6 +45,29 @@ func (r *room) sendTo(p *player, bs []byte) {
 		return
 	}
 	log.Printf("room: wrote to %v %q\n", p, bs)
+}
+
+// nextRound starts the next round, using snippet r. nextRound is not
+// concurrency safe.
+func (r *room) nextRound(nextSnippet snippet.Snippet) {
+	r.snippet = nextSnippet
+	oldId := r.roundId
+	r.roundId++
+	r.playerTypedFirstCorrectChar = make(map[*player]time.Time)
+
+	bs, err := json.Marshal(outgoingMsg{
+		NewRoundMsg: &NewRoundOutgoingMsg{
+			Snippet:    r.snippet.Code,
+			NewRoundId: r.roundId,
+			RoundId:    oldId,
+		},
+	})
+	if err != nil {
+		panic("marshalling a outgoingMsg should never result in an error")
+	}
+	for pp := range r.players {
+		r.sendTo(pp, bs)
+	}
 }
 
 func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
@@ -76,25 +100,7 @@ func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 			r.sendTo(pp, bs)
 		}
 
-		snip := snippet.Random()
-		r.snippet = snip
-		oldId := r.roundId
-		r.roundId++
-		r.playerTypedFirstCorrectChar = make(map[*player]time.Time)
-
-		bs, err = json.Marshal(outgoingMsg{
-			NewRoundMsg: &NewRoundOutgoingMsg{
-				Snippet:    r.snippet.Code,
-				NewRoundId: r.roundId,
-				RoundId:    oldId,
-			},
-		})
-		if err != nil {
-			panic("marshalling a outgoingMsg should never result in an error")
-		}
-		for pp := range r.players {
-			r.sendTo(pp, bs)
-		}
+		r.nextRound(snippet.Random())
 		return
 	}
 	bs, err := json.Marshal(
@@ -119,6 +125,40 @@ func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 func (r *room) handlePlayerSentChatMessage(p *player, content string) {
 	r.Lock()
 	defer r.Unlock()
+
+	if strings.HasPrefix(content, "/new-round-with-snippet") {
+		snippetName := content[len("/new-round-with-snippet "):]
+		s := snippet.Get(snippetName)
+		if s == nil {
+			content := fmt.Sprintf("there is no snippet with name %q", snippetName)
+			bs, err := json.Marshal(outgoingMsg{
+				ChatMessageMsg: &ChatMessageOutgoingMsg{
+					Content: content,
+					Sender:  "liracer",
+				},
+			})
+			if err != nil {
+				panic("marshalling a outgoingMsg should never result in an error")
+			}
+			r.sendTo(p, bs)
+		} else {
+			content := fmt.Sprintf("%v started a new round with snippet %s.", p, s.Name)
+			bs, err := json.Marshal(outgoingMsg{
+				ChatMessageMsg: &ChatMessageOutgoingMsg{
+					Content: content,
+					Sender:  "liracer",
+				},
+			})
+			if err != nil {
+				panic("marshalling a outgoingMsg should never result in an error")
+			}
+			for p := range r.players {
+				r.sendTo(p, bs)
+			}
+			r.nextRound(*s)
+		}
+		return
+	}
 
 	bs, err := json.Marshal(outgoingMsg{
 		ChatMessageMsg: &ChatMessageOutgoingMsg{

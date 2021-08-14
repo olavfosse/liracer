@@ -54,6 +54,18 @@ func Random() Snippet {
 	return snippets[rand.Intn(len(snippets))]
 }
 
+// Get returns the first snippet s for which s.Name == name.  If there
+// is no such snippet, nil is returned.
+func Get(name string) *Snippet {
+	for _, s := range snippets {
+		if s.Name == name {
+			return &snippets[rand.Intn(len(snippets))]
+		}
+	}
+	return nil
+
+}
+
 type Snippet struct {
 	Name     string
 	Code     string
