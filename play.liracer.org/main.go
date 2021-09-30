@@ -21,10 +21,11 @@ func main() {
 		log.Fatalln(`environment variable "ADDRESS" not present`)
 	}
 	_, useHTTPS := os.LookupEnv("USE_HTTPS")
-	log.Println("listening on", address)
 	if useHTTPS {
+		log.Println("Listening on https://" + address)
 		log.Fatalln(certmagic.HTTPS([]string{address}, nil))
 	} else {
+		log.Println("Listening on http://" + address)
 		log.Fatalln(http.ListenAndServe(address, nil))
 	}
 }
