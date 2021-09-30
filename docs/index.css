@@ -27,9 +27,9 @@
         filter: invert(100%);
     }
     /* The only thing which looks a bit off is the links, which now are green, yellow and turquise. Dark magic which I can't be bothered to explain where used to come up with these colors to make things look right again - sorry to whoever decides to change the color them again :P */
-    #a { color: #cc372d; }
-    #visited { color: #e63e32; }
-    #active { color: #0cc; }
+    a { color: #cc372d; }
+    a:visited { color: #e63e32; }
+    a:active { color: #0cc; }
 }
 
 p {
