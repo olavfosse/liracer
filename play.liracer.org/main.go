@@ -18,7 +18,7 @@ func main() {
 
 	address, ok := os.LookupEnv("ADDRESS")
 	if !ok {
-		log.Fatalln(`environment variable "ADDRESS" not pressent`)
+		log.Fatalln(`environment variable "ADDRESS" not present`)
 	}
 	_, useHTTPS := os.LookupEnv("USE_HTTPS")
 	log.Println("listening on", address)
