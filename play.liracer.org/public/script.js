@@ -36,21 +36,21 @@ const renderCodefield = () => {
 		s.textContent = c === "\n" ? s.textContent = "↵\n" : c
 
 		if (i < correctChars) {
-			s.style.setProperty('background', '#c5ddc5')
+			s.style.setProperty('background', 'var(--correct-char)')
 		}
 
 		Object.values(opponentCorrectChars).forEach(correctChars => {
 			if (i === correctChars) {
-				s.style.setProperty('background', '#baba70')
+				s.style.setProperty('background', 'var(--opponent-cursor)')
 			}
 		})
 
 		if (i >= correctChars && i < correctChars + incorrectChars) {
-			s.style.setProperty('background', '#dec5c5')
+			s.style.setProperty('background', 'var(--incorrect-char)')
 		}
 
 		if (i === correctChars + incorrectChars) {
-			s.style.setProperty('background', '#cebaa6')
+			s.style.setProperty('background', 'var(--player-cursor)')
 		}
 
 		codefield.appendChild(s)

@@ -88,16 +88,3 @@ main {
     outline: none;
     padding: 16px;
 }
-
-.codefield-character {
-    color: var(--layer-2-foreground);
-}
-
-.codefield-character-opponent {
-    background: var(--cursor-opponent-background);
-}
-
-.codefield-character-player {
-    background: var(--cursor-player-background);
-}
-
