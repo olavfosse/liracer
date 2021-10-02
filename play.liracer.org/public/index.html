@@ -286,7 +286,7 @@ const restart = () => {
 // character it represents.
 const mapKeyToChar = key => {
 	console.log(key)
-	if(['Shift', 'Meta', 'Alt', 'AltGraph', 'Control', 'Backspace'].includes(key)){
+	if(['Shift', 'Meta', 'Alt', 'AltGraph', 'Control', 'Backspace', 'CapsLock'].includes(key)){
 		return null
 	} else if (key === "Enter"){
 		return "\n"
