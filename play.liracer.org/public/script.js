@@ -1,3 +1,8 @@
+// https://css-tricks.com/the-trick-to-viewport-units-on-mobile/
+window.addEventListener('resize', () => {
+	document.documentElement.style.setProperty('--window-inner-height', `${window.innerHeight}px`);
+})
+
 /* ========= *
  * CONSTANTS *
  * ========= */

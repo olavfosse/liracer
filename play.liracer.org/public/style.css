@@ -6,11 +6,13 @@ main {
     box-sizing: border-box;
     padding: var(--window-gap);
     gap: var(--window-gap);
-    height: 100vh;
     width: 100vw;
     display: grid;
     grid-template-columns: 400px 1fr;
     grid-template-areas: "chat codefield";
+
+    /* https://css-tricks.com/the-trick-to-viewport-units-on-mobile/ */
+    height: var(--window-inner-height, 100vh);
 
     /* TODO: if the viewport is too narrow, dedicate all of it too the
        chat and output a message informing the user that they must
