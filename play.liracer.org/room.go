@@ -79,6 +79,10 @@ func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 	}
 
 	if correctChars == len(r.snippet.Code) {
+		if r.playerTypedFirstCorrectChar[p].IsZero() {
+			log.Printf("room: received correctChars message with correctChars=%d from %v, but %v has not typed any correctChars previously in this round: ignoring message\n", correctChars, p, p)
+			return
+		}
 		seconds := time.Since(r.playerTypedFirstCorrectChar[p]).Seconds()
 		characters := utf8.RuneCountInString(r.snippet.Code)
 		chatMessageContent := fmt.Sprintf(
