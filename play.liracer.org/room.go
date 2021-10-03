@@ -39,6 +39,9 @@ func newRoom() *room {
 // sendTo sends bs to p. If an error occurs p it is logged.  sendTo is
 // not concurrency safe.
 func (r *room) sendTo(p *player, bs []byte) {
+	// prevent a type of denial-of-service attack.
+	_ = p.SetWriteDeadline(time.Now().Add(time.Second)) // always returns nil
+
 	err := p.WriteMessage(websocket.TextMessage, bs)
 	if err != nil {
 		log.Printf("room: write to %v failed: %s\n", p, err)
