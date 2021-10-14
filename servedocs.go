@@ -1,3 +1,6 @@
+// serve docs/ for development purposes.
+//
+// the production website is served by github pages.
 package main
 
 import (
