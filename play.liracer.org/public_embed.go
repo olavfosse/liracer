@@ -5,7 +5,18 @@ package main
 
 import (
 	"embed"
+	"io/fs"
 )
 
 //go:embed public
-var publicFS embed.FS
+var publicEmbedFS embed.FS
+
+var publicFS fs.FS
+
+func init() {
+	var err error
+	publicFS, err = fs.Sub(publicEmbedFS, "public")
+	if err != nil {
+		panic(err)
+	}
+}
