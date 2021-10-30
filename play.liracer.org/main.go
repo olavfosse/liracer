@@ -9,7 +9,8 @@ import (
 )
 
 func main() {
-	http.Handle("/", http.FileServer(http.Dir("public")))
+	// For publicFS to be defined, use `embed` or `donotembed` build tag.
+	http.Handle("/", http.FileServer(http.FS(publicFS)))
 	// NOTE: The game URLs have to be of a form something like
 	//       https://play.liracer.org/?gameid=myepicgameid or
 	//       https://play.liracer.org/id/anotherepicgameid since the
