@@ -15,8 +15,11 @@ var upgrader = websocket.Upgrader{
 
 // newWsHandler returns a http handler function which is used to set up the
 // WebSocket endpoint that players interact with.
-func newWsHandler() func(http.ResponseWriter, *http.Request) {
-	rm := newRoom()
+func newWsHandler() (func(http.ResponseWriter, *http.Request), error) {
+	rm, err := newRoom()
+	if err != nil {
+		return nil, err
+	}
 	return func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
@@ -56,5 +59,5 @@ func newWsHandler() func(http.ResponseWriter, *http.Request) {
 				log.Printf("%v: unhandled message %q\n", p, bs)
 			}
 		}
-	}
+	}, nil
 }

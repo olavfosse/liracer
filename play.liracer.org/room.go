@@ -21,19 +21,25 @@ type room struct {
 	// when they typed their first char correctly.
 	playerTypedFirstCorrectChar map[*player]time.Time
 	snippet                     snippet.Snippet
+	snippetSet                  snippet.SnippetSet
 	roundId                     roundId
 }
 
 type roundId int
 
 // newRoom creates a new room with a random snippet.
-func newRoom() *room {
+func newRoom() (*room, error) {
+	snippetSet, err := snippet.ParseSnippetSet()
+	if err != nil {
+		return nil, err
+	}
 	return &room{
 		players:                     make(map[*player]struct{}),
 		playerTypedFirstCorrectChar: make(map[*player]time.Time),
-		snippet:                     snippet.Random(),
+		snippet:                     snippetSet.Random(),
+		snippetSet:                  *snippetSet,
 		roundId:                     1,
-	}
+	}, nil
 }
 
 // sendTo sends bs to p. If an error occurs p it is logged.  sendTo is
@@ -107,7 +113,7 @@ func (r *room) handlePlayerTypedCorrectChars(p *player, correctChars int) {
 			r.sendTo(pp, bs)
 		}
 
-		r.nextRound(snippet.Random())
+		r.nextRound(r.snippetSet.Random())
 		return
 	}
 	bs, err := json.Marshal(
@@ -135,7 +141,7 @@ func (r *room) handlePlayerSentChatMessage(p *player, content string) {
 
 	if strings.HasPrefix(content, "/new-round-with-snippet") {
 		snippetName := content[len("/new-round-with-snippet "):]
-		s := snippet.Get(snippetName)
+		s := r.snippetSet.Get(snippetName)
 		if s == nil {
 			content := fmt.Sprintf("there is no snippet with name %q", snippetName)
 			bs, err := json.Marshal(outgoingMsg{

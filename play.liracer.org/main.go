@@ -15,7 +15,11 @@ func main() {
 	//       https://play.liracer.org/?gameid=myepicgameid or
 	//       https://play.liracer.org/id/anotherepicgameid since the
 	//       previous URL form conflicts with the ws endpoint URL.
-	http.HandleFunc("/ws", newWsHandler())
+	handler, err := newWsHandler()
+	if err != nil {
+		panic(err)
+	}
+	http.HandleFunc("/ws", handler)
 
 	address, ok := os.LookupEnv("ADDRESS")
 	if !ok {
