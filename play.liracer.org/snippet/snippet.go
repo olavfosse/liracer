@@ -40,10 +40,17 @@ func ParseSnippetSet() (*SnippetSet, error) {
 		code := string(bs)
 		code = strings.Replace(code, "\r\n", "\n", -1)
 
+		lang := filepath.Base(filepath.Dir(path))
+		if lang == "go" {
+			// To prevent Go snippets from being treated like part of the codebase, and therefore causing VSCode "Problems", we prefix them all with "//go:build ignore\n". We do not however wish "//go:build ignore\n" to be included in snippet code served to the users.
+			// See also https://forum.golangbridge.org/t/how-to-ignore-files-in-vscode-go/25244.
+			code = strings.Replace(code, "//go:build ignore\n", "", 1)
+		}
+
 		snip := Snippet{
 			Name:     filepath.Base(path),
 			Code:     code,
-			Language: filepath.Base(filepath.Dir(path)),
+			Language: lang,
 		}
 		err = validate(snip)
 		if err != nil {
