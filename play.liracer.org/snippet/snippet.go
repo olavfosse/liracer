@@ -7,13 +7,16 @@ import (
 	"math/rand"
 	"path/filepath"
 	"strings"
+	"unicode"
 )
 
 //go:embed c/* go/* javascript/* shellscript/*
 var snippetsFS embed.FS
 
 type Snippet struct {
-	Name     string
+	Name string
+	// Code is ASCII-encoded, because I want a fixed-width encoding.
+	// If we need non-ASCII characters, I might switch to UTF-16.
 	Code     string
 	Language string
 }
@@ -37,7 +40,7 @@ func ParseSnippetSet() (*SnippetSet, error) {
 		if err != nil {
 			return err
 		}
-		code := string(bs)
+		code := string(bs) // we validate that this is ascii later
 		code = strings.Replace(code, "\r\n", "\n", -1)
 
 		lang := filepath.Base(filepath.Dir(path))
@@ -87,5 +90,25 @@ func validate(snip Snippet) error {
 	if snip.Code[len(snip.Code)-1] != '\n' {
 		return fmt.Errorf("invalid snippet %s/%s: last character is not newline", snip.Language, snip.Name)
 	}
+
+	if i := firstNonASCIIByteIndex(snip.Code); i != -1 {
+		return fmt.Errorf(
+			"invalid snippet %s/%s: byte at index %d is not ascii, bits = %08b",
+			snip.Language,
+			snip.Name,
+			i,
+			snip.Code[i],
+		)
+	}
 	return nil
+}
+
+// If s is valid ASCII, returns -1, otherwise returns index of first non-ASCII byte.
+func firstNonASCIIByteIndex(s string) int {
+	for i := 0; i < len(s); i++ {
+		if s[i] > unicode.MaxASCII {
+			return i
+		}
+	}
+	return -1
 }
