@@ -17,7 +17,7 @@ func main() {
 	//       previous URL form conflicts with the ws endpoint URL.
 	handler, err := newWsHandler()
 	if err != nil {
-		panic(err)
+		log.Fatalln(err)
 	}
 	http.HandleFunc("/ws", handler)
 

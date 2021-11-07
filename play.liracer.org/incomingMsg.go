@@ -1,5 +1,7 @@
 package main
 
+import "play.liracer.org/room"
+
 // incomingMsg is used to unmarshal incoming messages.
 type incomingMsg struct {
 	// If the CorrectCharsMsg field is non-nil, this field is used by the
@@ -17,7 +19,7 @@ type incomingMsg struct {
 // incomingMsg. Therefore the documentation for it lives there.
 type CorrectCharsIncomingMsg struct {
 	CorrectChars int
-	RoundId      roundId
+	RoundId      room.RoundID
 }
 
 // ChatMessageIncomingMsg is used exclusively as an optional field of

@@ -350,15 +350,14 @@ socket.addEventListener('message', e => {
 		isMessageHandled = true
 		const payload = m['NewRoundMsg']
 
-		if(roundID === undefined || payload['RoundId'] === roundID) {
-			snippet = payload['Snippet']
-			roundID = payload['NewRoundId']
-			correctChars = 0
-			incorrectChars = 0
-			opponentCorrectChars = {}
-			renderCodefield()
-		}
+		snippet = payload['Snippet']
+		roundID = payload['NewRoundId']
+		correctChars = 0
+		incorrectChars = 0
+		opponentCorrectChars = {}
+		renderCodefield()
 	}
+
 	if(m['OpponentCorrectCharsMsg'] !== null) {
 		isMessageHandled = true
 		const payload = m['OpponentCorrectCharsMsg']

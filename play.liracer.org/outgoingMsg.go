@@ -1,5 +1,7 @@
 package main
 
+import "play.liracer.org/room"
+
 // outgoingMsg is used to marshal outgoing messages.
 type outgoingMsg struct {
 	// If the NewRoundMsg field is non-nil, this field is used to tell a player
@@ -24,16 +26,15 @@ type outgoingMsg struct {
 // Therefore the documentation for it lives there.
 type NewRoundOutgoingMsg struct {
 	Snippet    string
-	NewRoundId roundId
-	RoundId    roundId
+	NewRoundId room.RoundID
 }
 
 // OpponentCorrectCharsOutgoingMsg is used exclusively as an optional field of
 // outgoingMsg. Therefore the documentation for it lives there.
 type OpponentCorrectCharsOutgoingMsg struct {
-	OpponentID   playerId
+	OpponentID   room.PlayerID
 	CorrectChars int
-	RoundId      roundId
+	RoundId      room.RoundID
 }
 
 // ChatMessageOutgoingMsg is used exclusively as an optional field of

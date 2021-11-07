@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"sync"
 
 	"github.com/gorilla/websocket"
+	"play.liracer.org/room"
 )
 
 var upgrader = websocket.Upgrader{
@@ -16,31 +18,99 @@ var upgrader = websocket.Upgrader{
 // newWsHandler returns a http handler function which is used to set up the
 // WebSocket endpoint that players interact with.
 func newWsHandler() (func(http.ResponseWriter, *http.Request), error) {
-	rm, err := newRoom()
+	toRoomQueue, err := room.Start()
 	if err != nil {
 		return nil, err
 	}
+
+	nextPlayerID := room.PlayerID(1)
+	nextPlayerIDMu := sync.Mutex{}
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			log.Println(err)
 			return
 		}
-		p := newPlayer(conn)
-		rm.handlePlayerJoined(p)
+		// TODO: set read deadlines
+		// TODO: set write deadline
+		// TODO: remove incomingMsg.go
+		// TODO: remove outgoingMsg.go
+		nextPlayerIDMu.Lock()
+		id := nextPlayerID
+		nextPlayerID++
+		nextPlayerIDMu.Unlock()
+
+		toPlayerQueue := make(chan room.PlayerMessage, 1000) // read only
+		go func() {
+			for message := range toPlayerQueue {
+				switch m := message.(type) {
+				case room.ChatMessage_PlayerMessage:
+					err := conn.WriteJSON(
+						outgoingMsg{
+							ChatMessageMsg: &ChatMessageOutgoingMsg{
+								Sender:  m.Sender,
+								Content: m.Content,
+							},
+						},
+					)
+					if err != nil {
+						log.Printf("room: write to %d failed: %s\n", id, err)
+						toRoomQueue <- room.Leave_RoomMessage(id)
+						return
+					}
+				case room.NewRound_PlayerMessage:
+					err := conn.WriteJSON(
+						outgoingMsg{
+							NewRoundMsg: &NewRoundOutgoingMsg{
+								Snippet:    m.Snippet,
+								NewRoundId: m.NewRoundID,
+								// TODO: remove NewRoundID from client/frontend
+							},
+						},
+					)
+					if err != nil {
+						log.Printf("room: write to %d failed: %s\n", id, err)
+						toRoomQueue <- room.Leave_RoomMessage(id)
+						return
+					}
+				case room.TypedCorrectChars_PlayerMessage:
+					err := conn.WriteJSON(
+						outgoingMsg{
+							OpponentCorrectCharsMsg: &OpponentCorrectCharsOutgoingMsg{
+								OpponentID:   m.PlayerID,
+								CorrectChars: m.Chars,
+							},
+						},
+					)
+					if err != nil {
+						log.Printf("room: write to %d failed: %s\n", id, err)
+						toRoomQueue <- room.Leave_RoomMessage(id)
+						return
+					}
+				}
+			}
+		}()
+
+		toRoomQueue <- room.Join_RoomMessage{
+			PlayerID:           id,
+			PlayerMessageQueue: toPlayerQueue,
+		}
+		defer func() {
+			toRoomQueue <- room.Leave_RoomMessage(id)
+		}()
 
 		for {
-			_, bs, err := p.ReadMessage()
+			_, bs, err := conn.ReadMessage()
 			if err != nil {
-				log.Printf("%v: read failed: %s\n", p, err)
-				rm.handlePlayerLeft(p)
+				log.Printf("player %d: read failed: %s\n", id, err)
 				return
 			}
-			log.Printf("%v: read message %q\n", p, bs)
+			log.Printf("player %d: read message %q\n", id, bs)
 			var m incomingMsg
 			err = json.Unmarshal(bs, &m)
 			if err != nil {
-				log.Printf("%v: unmarshal failed: %s", p, err)
+				log.Printf("player %d: unmarshal failed: %s", id, err)
 				continue
 			}
 
@@ -48,15 +118,22 @@ func newWsHandler() (func(http.ResponseWriter, *http.Request), error) {
 
 			if m.CorrectCharsMsg != nil {
 				messageUnhandled = false
-				rm.handlePlayerTypedCorrectChars(p, m.CorrectCharsMsg.CorrectChars)
+				toRoomQueue <- room.TypedCorrectChars_RoomMessage{
+					PlayerID: id,
+					RoundID:  m.CorrectCharsMsg.RoundId,
+					Chars:    m.CorrectCharsMsg.CorrectChars,
+				}
 			}
 
 			if m.ChatMessageMsg != nil {
 				messageUnhandled = false
-				rm.handlePlayerSentChatMessage(p, m.ChatMessageMsg.Content)
+				toRoomQueue <- room.ChatMessage_RoomMessage{
+					PlayerId: id,
+					Content:  m.ChatMessageMsg.Content,
+				}
 			}
 			if messageUnhandled {
-				log.Printf("%v: unhandled message %q\n", p, bs)
+				log.Printf("%d: unhandled message %q\n", id, bs)
 			}
 		}
 	}, nil
