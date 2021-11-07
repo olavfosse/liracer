@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"play.liracer.org/room"
@@ -32,8 +33,7 @@ func newWsHandler() (func(http.ResponseWriter, *http.Request), error) {
 			log.Println(err)
 			return
 		}
-		// TODO: set read deadlines
-		// TODO: set write deadline
+
 		// TODO: remove incomingMsg.go
 		// TODO: remove outgoingMsg.go
 		nextPlayerIDMu.Lock()
@@ -44,50 +44,36 @@ func newWsHandler() (func(http.ResponseWriter, *http.Request), error) {
 		toPlayerQueue := make(chan room.PlayerMessage, 1000) // read only
 		go func() {
 			for message := range toPlayerQueue {
+				var toWrite interface{}
 				switch m := message.(type) {
 				case room.ChatMessage_PlayerMessage:
-					err := conn.WriteJSON(
-						outgoingMsg{
-							ChatMessageMsg: &ChatMessageOutgoingMsg{
-								Sender:  m.Sender,
-								Content: m.Content,
-							},
+					toWrite = outgoingMsg{
+						ChatMessageMsg: &ChatMessageOutgoingMsg{
+							Sender:  m.Sender,
+							Content: m.Content,
 						},
-					)
-					if err != nil {
-						log.Printf("room: write to %d failed: %s\n", id, err)
-						toRoomQueue <- room.Leave_RoomMessage(id)
-						return
 					}
 				case room.NewRound_PlayerMessage:
-					err := conn.WriteJSON(
-						outgoingMsg{
-							NewRoundMsg: &NewRoundOutgoingMsg{
-								Snippet:    m.Snippet,
-								NewRoundId: m.NewRoundID,
-								// TODO: remove NewRoundID from client/frontend
-							},
+					toWrite = outgoingMsg{
+						NewRoundMsg: &NewRoundOutgoingMsg{
+							Snippet:    m.Snippet,
+							NewRoundId: m.NewRoundID,
 						},
-					)
-					if err != nil {
-						log.Printf("room: write to %d failed: %s\n", id, err)
-						toRoomQueue <- room.Leave_RoomMessage(id)
-						return
 					}
 				case room.TypedCorrectChars_PlayerMessage:
-					err := conn.WriteJSON(
-						outgoingMsg{
-							OpponentCorrectCharsMsg: &OpponentCorrectCharsOutgoingMsg{
-								OpponentID:   m.PlayerID,
-								CorrectChars: m.Chars,
-							},
+					toWrite = outgoingMsg{
+						OpponentCorrectCharsMsg: &OpponentCorrectCharsOutgoingMsg{
+							OpponentID:   m.PlayerID,
+							CorrectChars: m.Chars,
 						},
-					)
-					if err != nil {
-						log.Printf("room: write to %d failed: %s\n", id, err)
-						toRoomQueue <- room.Leave_RoomMessage(id)
-						return
 					}
+				}
+				conn.SetWriteDeadline(time.Now().Add(time.Second / 3)) // always returns nil
+				err = conn.WriteJSON(toWrite)
+				if err != nil {
+					log.Printf("room: write to %d failed: %s\n", id, err)
+					toRoomQueue <- room.Leave_RoomMessage(id)
+					return
 				}
 			}
 		}()
@@ -101,6 +87,11 @@ func newWsHandler() (func(http.ResponseWriter, *http.Request), error) {
 		}()
 
 		for {
+			// err := conn.SetReadDeadline(time.Now().Add(time.Second / 2))
+			// if err != nil {
+			// 	log.Printf("player %d: failed to set deadline: %s\n", id, err)
+			// 	return
+			// }
 			_, bs, err := conn.ReadMessage()
 			if err != nil {
 				log.Printf("player %d: read failed: %s\n", id, err)
