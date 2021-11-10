@@ -310,6 +310,13 @@ codefield.addEventListener("keydown", e => {
 		e.preventDefault()
 	}
 
+	if (e.key === "/") {
+		// WHY: On Firefox, pressing forward-slash makes the browser open a
+		//      "find in page" searchbar at the bottom calling e.preventDefault prevents
+		//      this.
+		e.preventDefault()
+	}
+
 	if(e.key === "Backspace") {
 		if (incorrectChars > 0) {
 			deleteIncorrectChar()
