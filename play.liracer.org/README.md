@@ -1,7 +1,8 @@
 To run liracer for development purposes run
 ```sh
-CGO_ENABLED=0 go run -tags donotembed .
+CGO_ENABLED=0 ADDRESS=localhost:3003 go run -tags donotembed .
 ```
+The TCP port is of course arbitrary.
 
 To build liracer for deployments run
 ```sh
