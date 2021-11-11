@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -24,8 +23,12 @@ func newWsHandler() (func(http.ResponseWriter, *http.Request), error) {
 		return nil, err
 	}
 
-	nextPlayerID := room.PlayerID(1)
-	nextPlayerIDMu := sync.Mutex{}
+	uniquePlayerIDs := make(chan room.PlayerID)
+	go func() {
+		for nextPlayerID := 1; ; nextPlayerID++ {
+			uniquePlayerIDs <- room.PlayerID(nextPlayerID)
+		}
+	}()
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		conn, err := upgrader.Upgrade(w, r, nil)
@@ -36,10 +39,7 @@ func newWsHandler() (func(http.ResponseWriter, *http.Request), error) {
 
 		// TODO: remove incomingMsg.go
 		// TODO: remove outgoingMsg.go
-		nextPlayerIDMu.Lock()
-		id := nextPlayerID
-		nextPlayerID++
-		nextPlayerIDMu.Unlock()
+		id := <-uniquePlayerIDs
 
 		toPlayerQueue := make(chan room.PlayerMessage, 1000) // read only
 		go func() {
