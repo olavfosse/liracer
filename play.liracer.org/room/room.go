@@ -109,7 +109,6 @@ func start(messageQueue <-chan RoomMessage, snippetSet *snippet.SnippetSet) {
 				continue
 			}
 			if p.typedFirstCorrectChar.IsZero() {
-				println("zero")
 				p.typedFirstCorrectChar = time.Now()
 			}
 			characters := len(currentSnippet.Code)
