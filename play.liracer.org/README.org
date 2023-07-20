@@ -17,6 +17,9 @@ example
   GOOS=linux GOARCH=arm64 CGO_ENABLED=0 time go build -tags embed . &> /dev/stdout
 #+end_src
 
+#+RESULTS:
+:         0.90 real         0.37 user         0.30 sys
+
 
 ~CGO_ENABLED=0~ might not be strictly necessary, but I ran into a
 problem today which was solved by adding this env variable so we might
